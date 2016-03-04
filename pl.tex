@@ -1,0 +1,110 @@
+\documentclass[11pt,twoside,a4paper]{article}
+
+\usepackage[english]{babel}
+
+\usepackage{amsthm}
+\usepackage{todonotes}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{url}
+\usepackage{listings}
+\usepackage{balance}
+\usepackage{epigraph}
+\usepackage{fixltx2e}
+\usepackage{graphicx}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{caption}
+\usepackage{color}
+\usepackage{hyperref}
+\usepackage{breakurl}
+
+\usepackage{cleveref}
+\crefname{section}{§}{§§}
+\Crefname{section}{§}{§§}
+
+\setlength{\belowcaptionskip}{0pt}
+% \setlength{\belowcaptionskip}{-10pt}
+% \setlength{\abovecaptionskip}{-5pt}
+
+\renewcommand\floatpagefraction{.9}
+\renewcommand\topfraction{.9}
+\renewcommand\bottomfraction{.9}
+\renewcommand\textfraction{.1}
+
+\usepackage[labelformat=simple]{subcaption}
+\renewcommand\thesubfigure{(\alph{subfigure})}
+
+\hypersetup{
+  colorlinks=true,
+  citebordercolor=cyan,
+  filebordercolor=red,
+  linkbordercolor=blue,
+  citecolor=cyan,
+  linkcolor=red,
+  urlcolor=blue}
+
+\captionsetup[figure]{labelfont=bf,font={small,it},margin=10pt}
+\captionsetup[figure]{labelfont=bf}
+
+\captionsetup[subfigure]{labelfont=bf,
+                         textfont=normalfont,
+                         singlelinecheck=off,
+                         justification=raggedright,
+                         font=small}
+
+\usepackage{MnSymbol}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{lemma}[theorem]{Lemma}
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+
+\theoremstyle{definition}
+\newtheorem{property}{Property}[section]
+
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+
+\lstset{basicstyle=\ttfamily\footnotesize,
+        numbers=left,
+        numbersep=5pt,
+        numberstyle=\tiny,
+        columns=fullflexible,
+        showstringspaces=false,
+        keywordstyle=\color{blue},
+        stringstyle=\color{red},
+        commentstyle=\color{purple},
+        morecomment=[l][\color{magenta}]{\#}}
+
+\newcommand*{\myprime}{^{\prime}\mkern-1.2mu}
+\newcommand*{\mydprime}{^{\prime\prime}\mkern-1.2mu}
+\newcommand*{\mytrprime}{^{\prime\prime\prime}\mkern-1.2mu}
+
+%% Fix numbering to be compatible with IEEE style.
+\renewcommand\thetheorem{\arabic{section}.\arabic{theorem}}
+\renewcommand\thedefinition{\arabic{section}.\arabic{definition}}
+
+\begin{document}
+
+\title{Programming Models and Languages for Distributed Computation}
+
+\author{Christopher S. Meiklejohn\\
+  Universit\'e catholique de Louvain\\
+  Louvain-la-Neuve, Belgium\\
+  \texttt{christopher.meiklejohn@gmail.com}}
+  
+\date{\today}
+\maketitle
+
+\tableofcontents
+
+\clearpage
+
+\input{promises}
+
+\bibliographystyle{abbrv}
+\bibliography{pl}
+\end{document}

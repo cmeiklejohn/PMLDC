@@ -1,0 +1,47 @@
+\begin{thebibliography}{1}
+
+\bibitem{Baker:1977:IGC:872734.806932}
+H.~C. Baker, Jr. and C.~Hewitt.
+\newblock The incremental garbage collection of processes.
+\newblock {\em SIGPLAN Not.}, 12(8):55--59, Aug. 1977.
+
+\bibitem{Bravo:2014:DDD:2633448.2633451}
+M.~Bravo, Z.~Li, P.~Van~Roy, and C.~Meiklejohn.
+\newblock Derflow: Distributed deterministic dataflow programming for erlang.
+\newblock In {\em Proceedings of the Thirteenth ACM SIGPLAN Workshop on
+  Erlang}, Erlang '14, pages 51--60, New York, NY, USA, 2014. ACM.
+
+\bibitem{1675100}
+D.~P. Friedman and D.~S. Wise.
+\newblock Aspects of applicative programming for parallel processing.
+\newblock {\em IEEE Transactions on Computers}, C-27(4):289--296, April 1978.
+
+\bibitem{halstead1985multilisp}
+R.~H. Halstead~Jr.
+\newblock Multilisp: A language for concurrent symbolic computation.
+\newblock {\em ACM Transactions on Programming Languages and Systems (TOPLAS)},
+  7(4):501--538, 1985.
+
+\bibitem{haridi1997overview}
+S.~Haridi, P.~Van~Roy, and G.~Smolka.
+\newblock An overview of the design of distributed oz.
+\newblock In {\em Proceedings of the second international symposium on Parallel
+  symbolic computation}, pages 176--187. ACM, 1997.
+
+\bibitem{henz1993oz}
+M.~Henz, G.~Smolka, and J.~W{\"u}rtz.
+\newblock Oz-a programming language for multi-agent systems.
+\newblock In {\em IJCAI}, pages 404--409, 1993.
+
+\bibitem{liskov1988promises}
+B.~Liskov and L.~Shrira.
+\newblock {\em Promises: linguistic support for efficient asynchronous
+  procedure calls in distributed systems}, volume~23.
+\newblock ACM, 1988.
+
+\bibitem{wiki:futures}
+Wikipedia.
+\newblock Futures and promises --- wikipedia{,} the free encyclopedia, 2016.
+\newblock [Online; accessed 4-March-2016].
+
+\end{thebibliography}
