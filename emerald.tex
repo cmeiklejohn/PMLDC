@@ -1,0 +1,55 @@
+\section{Eden and Emerald}
+
+\subsection{Relevant Reading}
+
+\begin{itemize}
+	\item \textit{The development of the Emerald programming language}, Black, Andrew P and Hutchinson, Norman C and Jul, Eric and Levy, Henry M, HOPL 2007~\cite{black2007development}.
+\end{itemize}
+
+\subsection{Commentary}
+
+%% TODO: Hydra reference
+%% TODO: Concurrent Euclid reference
+The Eden Programming Language (EPL) was a distributed programming language developed on top of Concurrent Euclid that extended the existing language with support for remote method invocations.  However, this support was far from ideal: incoming method invocation requests would have to be received and dispatched by a single thread while the programmer making the request would have to manually inspect error codes to ensure that the remove invocation succeeded.
+
+Eden also provided location-independent mobile objects, but the implementation was extremely costly.  In the implementation, each object was a full Unix process that could send and receive messages to each other: these messages would be sent using interprocess communication if located on the same node, resulting on latencies in the milliseconds.  Eden additionally implemented a ``kernel'' object for dispatching messages between processes, resulting in a single message between two objects on the same system taking over 100 milliseconds, the cost of two context switches at the time.  To make applications developed in EPL more efficient, application developers would use a lightweight heap-based object implemented in Concurrent Euclid (that, appeared as a single Eden object consuming a single Unix process) for objects that needed to communicate, but were located on the same machine, that would communicate through shared memory.  Obviously, the next problem follows naturally: the single abstraction provided resulted in extremely slow applications, so, a new abstraction was provided to compensate, and the user is now left having to program with two object models.
+
+In a legendary memo entitled ``Getting to Oz'', the language designers of Eden and the soon-to-be language designers began discussions to improve the design of Eden.  This new language would be entitled ``Emerald''\footnote{As in, the Emerald city from the ``Wizard of Oz'' referencing the original runtime for the Oz language ``Toto'', and the nickname for Seattle}.
+
+We enumerate here the list of specific goals the language designers had for Emerald, outside of the general improvements they wanted to make on Eden.
+\begin{enumerate}
+\item Convinced distributed objects were a good idea and the right way to construct distributed programs, they sought to \textit{improve the performance of distributed objects.}
+\item Objects should stay relatively cost-free, for instance, if they do not take advantage of distribution: \textit{no-use, no-cost}.
+\item \textit{Simplify} and reduce the dual object model, remove explicit dispatching, error handling and other warts in the Eden model.
+\item To support \textit{the principle of information hiding} and have a single semantics for both large and small, local or distributed, objects.
+\item Distributed programs can fail: the network can be down, a service can be unavailable, and therefore a language for building distributed applications needs to \textit{provide the programmer tools for dealing with these failures.}
+\item \textit{Minimization of the language} by removing many of the features seen in other languages and building abstractions that could be used to extend the language.
+\item \textit{Object location needs to be explicit} even as much as the authors wanted to follow the \textit{principle of information hiding} as it directly impacts performance.  Objects should be able to move moved, but moving an object should not change the operational semantics of the language\footnote{This dichotomy is presented as the \textit{semantics} vs. the \textit{locatics} of the language and the authors soon realized that one aspect of the language influenced both of these: failures.}.
+\end{enumerate}
+
+%% TODO: call-by-move
+%% TODO: citation 59
+
+%% Technical innovations.
+
+\subsection{Impact and Implementations}
+
+Emerald made several technical innovations that we will present below.
+
+
+
+
+
+
+
+The authors of Eden and Emerald express an extremely interesting point early on in their paper on the history of Emerald~\cite{black2007development}: the reason for the poor abstractions requiring manual dispatch of method invocations to threads, and the explicit error handling from network anomalies, was because as researchers working on a language, \textit{they were not implementing distributed applications themeselves.}  To quote the authors:
+
+\begin{quote}
+``Eden team had real experience with writing distributed applications, we had not yet learned what support should be provided. For example, it was not clear to us whether or not each incoming call should be run in its own thread (possibly leading to excessive resource contention), whether or not all calls should run in the same thread (possibly leading to deadlock), whether or not there should be a thread pool of a bounded size (and if so, how to choose it), or whether or not there was some other, more elegant solution that we hadn’t yet thought of. So we left it to the application programmer to build whatever invocation thread management system seemed appropriate: EPL was partly a language, and partly a kit of components. The result of this approach was that there was no clear separation between the code of the application and the scaffolding necessary to implement remote calls.''	
+\end{quote}
+
+
+
+
+%% TODO: Java RMI
+%% TODO: CORBA
