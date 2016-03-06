@@ -1,20 +1,21 @@
-\section{Eden and Emerald}
+\section{Emerald}
 
 \subsection{Relevant Reading}
 
 \begin{itemize}
 	\item \textit{The development of the Emerald programming language}, Black, Andrew P and Hutchinson, Norman C and Jul, Eric and Levy, Henry M, HOPL 2007~\cite{black2007development}.
+	\item \textit{Distribution and Abstract Types in Emerald}, A. Black and N. Hutchinson and E. Jul and H. Levy and L. Carter, IEEE 1987~\cite{1702134}.
+	\item \textit{Emerald: A general-purpose programming language}, Raj, Rajendra K. and Tempero, Ewan and Levy, Henry M. and Black, Andrew P. and Hutchinson, Norman C. and Jul, Eric, Software Practice and Experience, 1991~\cite{SPE:SPE4380210107}.
+	\item \textit{Object Structure in the Emerald System}, Black, Andrew and Hutchinson, Norman and Jul, Eric and Levy, Henry, OOPLSA '86~\cite{Black:1986:OSE:28697.28706}.
 \end{itemize}
 
 \subsection{Commentary}
 
-%% TODO: Hydra reference
-%% TODO: Concurrent Euclid reference
-The Eden Programming Language (EPL) was a distributed programming language developed on top of Concurrent Euclid that extended the existing language with support for remote method invocations.  However, this support was far from ideal: incoming method invocation requests would have to be received and dispatched by a single thread while the programmer making the request would have to manually inspect error codes to ensure that the remove invocation succeeded.
+The Eden Programming Language (EPL) was a distributed programming language developed on top of Concurrent Euclid~\cite{holt1982short} that extended the existing language with support for remote method invocations.  However, this support was far from ideal: incoming method invocation requests would have to be received and dispatched by a single thread while the programmer making the request would have to manually inspect error codes to ensure that the remove invocation succeeded.
 
 Eden also provided location-independent mobile objects, but the implementation was extremely costly.  In the implementation, each object was a full Unix process that could send and receive messages to each other: these messages would be sent using interprocess communication if located on the same node, resulting on latencies in the milliseconds.  Eden additionally implemented a ``kernel'' object for dispatching messages between processes, resulting in a single message between two objects on the same system taking over 100 milliseconds, the cost of two context switches at the time.  To make applications developed in EPL more efficient, application developers would use a lightweight heap-based object implemented in Concurrent Euclid (that, appeared as a single Eden object consuming a single Unix process) for objects that needed to communicate, but were located on the same machine, that would communicate through shared memory.  Obviously, the next problem follows naturally: the single abstraction provided resulted in extremely slow applications, so, a new abstraction was provided to compensate, and the user is now left having to program with two object models.
 
-In a legendary memo entitled ``Getting to Oz'', the language designers of Eden and the soon-to-be language designers began discussions to improve the design of Eden.  This new language would be entitled ``Emerald''\footnote{As in, the Emerald city from the ``Wizard of Oz'' referencing the original runtime for the Oz language ``Toto'', and the nickname for Seattle}.
+In a legendary memo entitled ``Getting to Oz'', the language designers of Eden and the soon-to-be language designers began discussions to improve the design of Eden.  This new language would be entitled ``Emerald''\footnote{As in, the Emerald city from ``The Wonderful Wizard of Oz'' referencing the original runtime for the Oz language ``Toto'', and the nickname for Seattle}.
 
 We enumerate here the list of specific goals the language designers had for Emerald, outside of the general improvements they wanted to make on Eden.
 \begin{enumerate}
@@ -27,29 +28,55 @@ We enumerate here the list of specific goals the language designers had for Emer
 \item \textit{Object location needs to be explicit} even as much as the authors wanted to follow the \textit{principle of information hiding} as it directly impacts performance.  Objects should be able to move moved, but moving an object should not change the operational semantics of the language\footnote{This dichotomy is presented as the \textit{semantics} vs. the \textit{locatics} of the language and the authors soon realized that one aspect of the language influenced both of these: failures.}.
 \end{enumerate}
 
-%% TODO: call-by-move
-%% TODO: citation 59
-
-%% Technical innovations.
-
 \subsection{Impact and Implementations}
 
-Emerald made several technical innovations that we will present below.
+The technical innovations for Emerald, a system that was under primary development from 1983 to 1987 (and later continued by various graduate students) are numerous.  We highlight a few of the most important technical innovations below:
 
+\begin{enumerate}
+\item Emerald presented a \textit{single object model} for both distributed and local objects.  Each object has a globally unique identifier, internal state, and a set of methods that could be invoked.  These objects could run in their own process, if necessary, or not.  (In fact, objects encapsulated their processes and launched them on object invocation.)
+\item Objects could exist with different types of implementations in this unified model: \textit{global} objects, or objects that could be accessed either locally or remote; \textit{local} objects, that were optimized for local access only, and determined as best as possible at compile time; and \textit{direct}, or objects that represented primitive types.
+\item Emerald was a statically-typed language, that had dynamic type checking for objects that were received over the wire.  This was achieved using a notion of \textit{protocols} and \textit{conformity}-based typing.  Dynamic type checking would be performed by ensuring types at runtime were compatible based on their interfaces.  This was done by forming a type lattice and computing both the \textit{join} and \textit{meet} based on the \textit{abstract}, or compile-time provided type, and the \textit{concrete} implementation provided at runtime.
+\item Emerald's type system also provided \textit{capabilities}, where types could either be \textit{restricted} to a higher type in the type lattice, or \textit{viewed} at a lower type in the type lattice.
+\item Synchronization between processes in Emerald was achieved using \textit{monitors} to achieve mutual exclusion with condition signaling~\cite{hoare1974monitors}.
+\item Mobility in Emerald was provided using explicit placement primitives.  Processes could be \textit{moved} to a new location, \textit{fixed} at a precise location, and \textit{located}.  Emerald also provided two new parameter evaluation modes based on mobility: \textit{call-by-move}, or move the parameter object to the invocation location, and \textit{call-by-visit}, by remote access of the parameter object from the invocation's location.
+\item Errors related to network availability were not considered exceptions, and special notation for handling these errors was provided to the programmer.
+\end{enumerate}
 
+Emerald (and Eden's) influence on programming languages throughout the history of programming languages is paramount.  Emerald specifically innovated in two main areas: distributed objects and advanced type systems, which is interesting because the innovations in type systems were only done to support the development of distributed objects in the Emerald system.
 
+The idea of type \textit{conformity} over a type lattice with both \textit{concrete} and \textit{abstract} types influenced the further development of \textit{protocols}, mechanisms to specify the external behavior of an objects, in the ANSI 1997 Smalltalk standard.
 
+%% TODO: SOS.
+%% TODO: OMG CORBA
 
+Developers of the Modula-3 Network Objects~\cite{Birrell:1993:NO:168619.168637} system took what they felt was the most essential and the best of both the Emerald and SOS systems.  This system forewent the mobility of objects in favor of marshalling.  In the author's own words:
 
+\begin{quote}
+``We believe it is better to provide powerful marshaling than object mobility. The two facilities are similar, because both of them allow the programmer the option of communicating objects by reference or by copying. Either facility can be used to distribute data and computation as needed by applications. Object mobility offers slightly more flexibility, because the same object can be either sent by reference or moved; while with our system, network objects are always sent by reference and other objects are always sent by copying. However, this extra flexibility doesn’t seem to us to be worth the substantial increase in complexity of mobile objects.''
+\end{quote}
 
-The authors of Eden and Emerald express an extremely interesting point early on in their paper on the history of Emerald~\cite{black2007development}: the reason for the poor abstractions requiring manual dispatch of method invocations to threads, and the explicit error handling from network anomalies, was because as researchers working on a language, \textit{they were not implementing distributed applications themeselves.}  To quote the authors:
+Both Java's RMI system and Jini (and their predecessor OMG's CORBA) were influenced by Emerald as well, however not without a fierce discussion on the merits of distinguishing between remote and local method invocations, motivated by legendary technical report\footnote{While we acknowledge the lineage here beginning with systems like Eden and Emerald, the majority of the criticisms of this technical report are targeted towards OMG's CORBA system.} by Sun Microsystems' research division.
+
+Jim Waldo, primary author of the aforementioned technical report, writes:
+
+\begin{quote}
+``The RMI system (and later the Jini system) took many of the ideas pioneered in Emerald having to do with moving objects around the network. We introduced these ideas to allow us to deal with the problems found in systems like CORBA with type truncation (and which were dealt with in Network Objects by doing the closest-match); the result was that passing an object to a remote site resulted in passing [a copy of] exactly that object, including when necessary a copy of the code (made possible by Java bytecodes and the security mechanisms). This was exploited to some extent in the RMI world, and far more fully in the Jini world, making both of those systems more Emerald-like than we realized at the time.''
+\end{quote}
+
+The authors eventually come to a similar conclusion to many distributed systems practitioners today and other critics in their research area: that availability, reliability, and the network remain the paramount challenges and add fuel to the fire against any location-transparent semantics provided by mobile objects.  These still remain as much of a challenge for the developers of distributed programs today, as they did in 1983 at the start of the development lineage from Eden to Emerald:
+
+\begin{quote}
+``Mobile objects promise to make that same simplicity available in a distributed setting: the same semantics, the same parameter mechanisms, and so on.  But this promise must be illusory. In a distributed setting the programmer must deal with issues of availability and reliability. So programmers have to replicate their objects, manage the replicas, and worry about 'one copy semantics'. Things are not so simple any more, because the notion of object identity supported by the programming language is no longer the same as the application’s notion of identity. We can make things simple only by giving up on reliability, fault tolerance, and availability — but these are the reasons that we build distributed systems.''
+\end{quote}
+
+The authors of Eden and Emerald express an extremely interesting point early on in their paper on the history of Emerald~\cite{black2007development}: the reason for the poor abstractions requiring manual dispatch of method invocations to threads, and the explicit error handling from network anomalies, was because as researchers working on a language, \textit{they were not implementing distributed applications themselves.}  To quote the authors:
 
 \begin{quote}
 ``Eden team had real experience with writing distributed applications, we had not yet learned what support should be provided. For example, it was not clear to us whether or not each incoming call should be run in its own thread (possibly leading to excessive resource contention), whether or not all calls should run in the same thread (possibly leading to deadlock), whether or not there should be a thread pool of a bounded size (and if so, how to choose it), or whether or not there was some other, more elegant solution that we hadn’t yet thought of. So we left it to the application programmer to build whatever invocation thread management system seemed appropriate: EPL was partly a language, and partly a kit of components. The result of this approach was that there was no clear separation between the code of the application and the scaffolding necessary to implement remote calls.''	
 \end{quote}
 
+I will close this section on Emerald with a quote from the authors.
 
-
-
-%% TODO: Java RMI
-%% TODO: CORBA
+\begin{quote}
+``We are all proud of Emerald, and feel that it is one of the most significant pieces of research we have ever undertaken. People who have never heard of Emerald are surprised that a language that is so old, and was implemented by so small a team, does so much that is 'modern'. If asked to describe Emerald briefly, we sometimes say that it’s like Java, except that it has always had generics, and that its objects are mobile.''	
+\end{quote}
