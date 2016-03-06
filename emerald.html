@@ -37,8 +37,8 @@
 <blockquote>
 <p>“We believe it is better to provide powerful marshaling than object mobility. The two facilities are similar, because both of them allow the programmer the option of communicating objects by reference or by copying. Either facility can be used to distribute data and computation as needed by applications. Object mobility offers slightly more flexibility, because the same object can be either sent by reference or moved; while with our system, network objects are always sent by reference and other objects are always sent by copying. However, this extra flexibility doesn’t seem to us to be worth the substantial increase in complexity of mobile objects.”</p>
 </blockquote>
-<p>Both Java’s RMI system and Jini (and their predecessor OMG’s CORBA) were influenced by Emerald as well, however not without a fierce discussion on the merits of distinguishing between remote and local method invocations, motivated by legendary technical report<a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a> by Sun Microsystems’ research division.</p>
-<p>Jim Waldo, primary author of the aforementioned technical report, writes:</p>
+<p>Both Java’s RMI system and Jini (and their predecessor OMG’s CORBA) were influenced by Emerald as well, however not without a fierce discussion on the merits of distinguishing between remote and local method invocations, motivated by legendary technical report <span class="citation">Kendall et al. (1994)</span> by Sun Microsystems’ research division<a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a>.</p>
+<p>Jim Waldo, author of the aforementioned technical report, writes:</p>
 <blockquote>
 <p>“The RMI system (and later the Jini system) took many of the ideas pioneered in Emerald having to do with moving objects around the network. We introduced these ideas to allow us to deal with the problems found in systems like CORBA with type truncation (and which were dealt with in Network Objects by doing the closest-match); the result was that passing an object to a remote site resulted in passing [a copy of] exactly that object, including when necessary a copy of the code (made possible by Java bytecodes and the security mechanisms). This was exploited to some extent in the RMI world, and far more fully in the Jini world, making both of those systems more Emerald-like than we realized at the time.”</p>
 </blockquote>
@@ -72,6 +72,9 @@
 </div>
 <div id="ref-holt1982short">
 <p>Holt, Richard C. 1982. “A Short Introduction to Concurrent Euclid.” <em>ACM Sigplan Notices</em> 17 (5). ACM: 60–79.</p>
+</div>
+<div id="ref-kendall1994note">
+<p>Kendall, Samuel C, Jim Waldo, Ann Wollrath, and Geoff Wyant. 1994. “A Note on Distributed Computing.” Sun Microsystems, Inc.</p>
 </div>
 <div id="ref-SPE:SPE4380210107">
 <p>Raj, Rajendra K., Ewan Tempero, Henry M. Levy, Andrew P. Black, Norman C. Hutchinson, and Eric Jul. 1991. “Emerald: A General-Purpose Programming Language.” <em>Software: Practice and Experience</em> 21 (1). John Wiley &amp; Sons, Ltd.: 91–118. doi:<a href="https://doi.org/10.1002/spe.4380210107">10.1002/spe.4380210107</a>.</p>
