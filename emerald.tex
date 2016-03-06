@@ -7,6 +7,7 @@
 	\item \textit{Distribution and Abstract Types in Emerald}, A. Black and N. Hutchinson and E. Jul and H. Levy and L. Carter, IEEE 1987~\cite{1702134}.
 	\item \textit{Emerald: A general-purpose programming language}, Raj, Rajendra K. and Tempero, Ewan and Levy, Henry M. and Black, Andrew P. and Hutchinson, Norman C. and Jul, Eric, Software Practice and Experience, 1991~\cite{SPE:SPE4380210107}.
 	\item \textit{Object Structure in the Emerald System}, Black, Andrew and Hutchinson, Norman and Jul, Eric and Levy, Henry, OOPLSA '86~\cite{Black:1986:OSE:28697.28706}.
+	\item \textit{Typechecking Polymorphism in Emerald}, Black, Andrew P. and Hutchinson, Norman, Technical Report CRL 91/1, Digital Cambridge Research Laboratory, 1991\footnote{No reference found.}.
 \end{itemize}
 
 \subsection{Commentary}
@@ -38,7 +39,7 @@ The technical innovations for Emerald, a system that was under primary developme
 \item Emerald was a statically-typed language, that had dynamic type checking for objects that were received over the wire.  This was achieved using a notion of \textit{protocols} and \textit{conformity}-based typing.  Dynamic type checking would be performed by ensuring types at runtime were compatible based on their interfaces.  This was done by forming a type lattice and computing both the \textit{join} and \textit{meet} based on the \textit{abstract}, or the compile-time provided type, and the \textit{concrete} implementation that were provided at runtime.
 \item Emerald's type system also provided \textit{capabilities}, where types could either be \textit{restrict}ed to a higher type in the type lattice, or \textit{view}ed at a lower type in the type lattice.
 \item Synchronization between processes in Emerald was achieved using \textit{monitors} to achieve mutual exclusion with condition signaling and waiting~\cite{hoare1974monitors}.
-\item Mobility in Emerald was provided using explicit placement primitives.  Processes could be \textit{moved} to a new location, \textit{fix}ed at a precise location, and \textit{locate}d.  Emerald also provided two new parameter evaluation modes based on mobility: \textit{call-by-move}, or move the parameter object to the invocation location, and \textit{call-by-visit}, by remote access of the parameter object from the invocation's location.
+\item Mobility in Emerald was provided using explicit placement primitives.  Processes could be \textit{moved} to a new location, \textit{fix}ed at a precise location, and \textit{locate}d.  Emerald also provided two new parameter evaluation modes based on mobility: \textit{call-by-move}\footnote{This is a departure from systems like Argus that assumed all arguments were passed using call-by-value.}, or move the parameter object to the invocation location, and \textit{call-by-visit}, by remote access of the parameter object from the invocation's location.  When objects were moved, the old placement would store a \textit{forwarding address} that would be used to route messages forward; timestamps were used to detect routing loops and reference the most recent object and to avoid stable storage of the forwarding addresses, reliable broadcast was used to find lost pointers.
 \item Errors related to network availability were not considered exceptions; therefore special notation for handling these errors was provided to the programmer.
 \end{enumerate}
 
