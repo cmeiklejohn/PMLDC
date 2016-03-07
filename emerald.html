@@ -1,4 +1,3 @@
-<h1 id="emerald">Emerald</h1>
 <h2 id="relevant-reading">Relevant Reading</h2>
 <ul>
 <li><p><em>The development of the Emerald programming language</em>, Black, Andrew P and Hutchinson, Norman C and Jul, Eric and Levy, Henry M, HOPL 2007 <span class="citation">A. P. Black et al. (2007)</span>.</p></li>
@@ -10,8 +9,8 @@
 </ul>
 <p>These texts, and more, are available from the languages website, <a href="http://www.emeraldprogramminglanguage.org" class="uri">http://www.emeraldprogramminglanguage.org</a>.</p>
 <h2 id="commentary">Commentary</h2>
-<p>The Eden Programming Language (EPL) was a distributed programming language developed on top of Concurrent Euclid <span class="citation">Holt (1982)</span> that extended the existing language with support for remote method invocations. However, this support was far from ideal: incoming method invocation requests would have to be received and dispatched by a single thread while the programmer making the request would have to manually inspect error codes to ensure that the remove invocation succeeded.</p>
-<p>Eden also provided location-independent mobile objects, but the implementation was extremely costly. In the implementation, each object was a full Unix process that could send and receive messages to each other: these messages would be sent using interprocess communication if located on the same node, resulting in latencies in the milliseconds. Eden additionally implemented a “kernel” object for dispatching messages between processes, resulting in a single message between two objects on the same system taking over 100 milliseconds, the cost of two context switches at the time. To make applications developed in EPL more efficient, application developers would use a lightweight heap-based object implemented in Concurrent Euclid (that, appeared as a single Eden object consuming a single Unix process) for objects that needed to communicate, but were located on the same machine, that would communicate through shared memory. Obviously, the next problem follows naturally: the single abstraction provided resulted in extremely slow applications, so, a new abstraction was provided to compensate, and the user is now left having to program with two object models.</p>
+<p>The Eden Programming Language (EPL) was a distributed programming language developed on top of Concurrent Euclid <span class="citation">Holt (1982)</span> that extended the existing language with support for remote method invocations. However, this support was far from ideal: incoming method invocation requests would have to be received and dispatched by a single thread while the programmer making the request would have to manually inspect error codes to ensure that the remote invocation succeeded.</p>
+<p>Eden also provided location-independent mobile objects, but the implementation was extremely costly. In the implementation, each object was a full Unix process that could send and receive messages to each other: these messages would be sent using interprocess communication if located on the same node, resulting in latencies in the milliseconds. Eden additionally implemented a “kernel” object for dispatching messages between processes, resulting in a single message between two objects on the same system taking over 100 milliseconds, the cost of two context switches at the time. To make applications developed in EPL more efficient, application developers would use a lightweight heap-based object implemented in Concurrent Euclid (that, appeared as a single Eden object consuming a single Unix process) for objects that needed to communicate, but were located on the same machine, that would communicate through shared memory. The next problem follows naturally: the single abstraction provided resulted in extremely slow applications, so, a new abstraction was provided to compensate leaving the user with two different object models.</p>
 <p>In a legendary memo entitled “Getting to Oz”, the language designers of Eden and the soon-to-be language designers began discussions to improve the design of Eden. This new language would be entitled “Emerald”<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>.</p>
 <p>We enumerate here the list of specific goals the language designers had for Emerald, outside of the general improvements they wanted to make on Eden.</p>
 <ol>
@@ -79,6 +78,9 @@
 <div id="ref-kendall1994note">
 <p>Kendall, Samuel C, Jim Waldo, Ann Wollrath, and Geoff Wyant. 1994. “A Note on Distributed Computing.” Sun Microsystems, Inc.</p>
 </div>
+<div id="ref-liskov1988distributed">
+<p>Liskov, Barbara. 1988. “Distributed Programming in Argus.” <em>Communications of the ACM</em> 31 (3). ACM: 300–312.</p>
+</div>
 <div id="ref-SPE:SPE4380210107">
 <p>Raj, Rajendra K., Ewan Tempero, Henry M. Levy, Andrew P. Black, Norman C. Hutchinson, and Eric Jul. 1991. “Emerald: A General-Purpose Programming Language.” <em>Software: Practice and Experience</em> 21 (1). John Wiley &amp; Sons, Ltd.: 91–118. doi:<a href="https://doi.org/10.1002/spe.4380210107">10.1002/spe.4380210107</a>.</p>
 </div>
@@ -91,7 +93,7 @@
 <ol>
 <li id="fn1"><p>As in, the Emerald city from “The Wonderful Wizard of Oz” referencing the original runtime for the Oz language “Toto”, and the nickname for Seattle.<a href="#fnref1">↩</a></p></li>
 <li id="fn2"><p>This dichotomy is presented as the <em>semantics</em> vs. the <em>locatics</em> of the language and the authors soon realized that one aspect of the language influenced both of these: failures.<a href="#fnref2">↩</a></p></li>
-<li id="fn3"><p>This is a departure from systems like Argus that assumed all arguments were passed using call-by-value.<a href="#fnref3">↩</a></p></li>
+<li id="fn3"><p>This is a departure from systems like Argus <span class="citation">Liskov (1988)</span> that assumed all arguments were passed using call-by-value.<a href="#fnref3">↩</a></p></li>
 <li id="fn4"><p>While we acknowledge the lineage here beginning with systems like Eden and Emerald, the majority of the criticisms of this technical report are targeted towards OMG’s CORBA system.<a href="#fnref4">↩</a></p></li>
 </ol>
 </div>
