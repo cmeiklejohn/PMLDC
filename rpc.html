@@ -1,5 +1,6 @@
 <h2 id="relevant-reading">Relevant Reading</h2>
 <ul>
+<li><p><em>A Critique of the Remote Procedure Call Paradigm</em>, Tanenbaum and van Renesse, 1987 <span class="citation">Tanenbaum and Renesse (1987)</span>.</p></li>
 <li><p><em>A Note On Distributed Computing</em>, Kendall, Waldo, Wollrath, Wyant, 1994 <span class="citation">Kendall et al. (1994)</span>.</p></li>
 <li><p><em>It’s Just A Mapping Problem</em>, Vinoski, 2003 <span class="citation">Vinoski (2003)</span>.</p></li>
 <li><p><em>Convenience Over Correctness</em>, Vinoski, 2008 <span class="citation">Vinoski (2008)</span>.</p></li>
@@ -11,24 +12,39 @@
 <h3 id="timeline">Timeline</h3>
 <ul>
 <li><p><span>1974:</span> RFC 674,<br />
-“Procedure Call Protocol Documents, Version 2”</p></li>
+“Procedure Call Protocol Documents, Version 2”<br />
+RFC 674 attempts to define a general way to share resources across <strong>all 70 nodes</strong> of the Internet. This work is performed at Bolt, Beranek and Newman (BBN Technologies).<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a></p></li>
 <li><p><span>1975:</span> RFC 684,<br />
-“A Commentary on Procedure Calling as a Network Protocol”</p></li>
+“A Commentary on Procedure Calling as a Network Protocol”<br />
+First outlines the problems of RPC and how they related to fundamental problems in distributed systems.</p></li>
 <li><p><span>1976:</span> RFC 707,<br />
-“A High-Level Framework for Network-Based Resource Sharing”</p></li>
-<li><p><span>1984:</span> “Implementing Remote Procedure Calls”</p></li>
-<li><p><span>1987:</span> Distribution and Abstract Types in Emerald</p></li>
-<li><p><span>1988:</span> Distributed Programing in Argus</p></li>
+“A High-Level Framework for Network-Based Resource Sharing”<br />
+An attempt to “mechanize” the TELNET and FTP protocols through a generalization to functions.</p></li>
+<li><p><span>1984:</span> “Implementing Remote Procedure Calls” <span class="citation">Birrell and Nelson (1984)</span><br />
+In this work, the <strong>sunrpc</strong> mechanism is defined.</p></li>
+<li><p><span>1987:</span> Distribution and Abstract Types in Emerald <span class="citation">Black et al. (1987)</span><br />
+One of the first major implementations of distributed objects containing distribution-specific calling conventions, such as <em>call-by-move</em>.</p></li>
+<li><p><span>1987:</span> A Critique of the Remote Procedure Call Paradigm <span class="citation">Tanenbaum and Renesse (1987)</span><br />
+Tanenbaum and van Renesse provide a criticism, similar to the one in RFC 684, on why the RPC model is the wrong model for distributed computing.</p></li>
+<li><p><span>1988:</span> Distributed Programing in Argus <span class="citation">Liskov (1988)</span><br />
+In Argus, atomic units of computation referred to as “guardians” coordinate application of effects and rollback.</p></li>
 <li><p><span>1988:</span> RFC 1057,<br />
-“Remote Procedure Call Protocol Specification, Version 2”</p></li>
-<li><p><span>1991:</span> CORBA 1.0</p></li>
-<li><p><span>1996:</span> “A Distributed Object Model for the Java System”</p></li>
-<li><p><span>1997:</span> CORBA 2.0</p></li>
-<li><p><span>1999+:</span> EJB, XML-RPC, SOAP, REST</p></li>
+“Remote Procedure Call Protocol Specification, Version 2”<br />
+Defines <strong>sunrpc</strong> as a standard along with its supporting infrastructure, such as portmapper, that’s used in the creation of NFS.</p></li>
+<li><p><span>1991:</span> CORBA 1.0<br />
+CORBA 1.0 introduces distributed objects.</p></li>
+<li><p><span>1994:</span> A Note On Distributed Computing <span class="citation">Kendall et al. (1994)</span><br />
+Kendall et al. also talk in great length about why the RPC model, extended to objects, is problematic.</p></li>
+<li><p><span>1996:</span> A Distributed Object Model for the Java System <span class="citation">Wollrath, Riggs, and Waldo (1996)</span><br />
+Introduces the Java RMI system.</p></li>
+<li><p><span>1997:</span> CORBA 2.0<br />
+CORBA 2.0 represents the major release of CORBA that most people are familiar with.</p></li>
+<li><p><span>1999-:</span> EJB, XML-RPC, SOAP, REST, Thrift, Finagle, gRPC, etc.<br />
+Modern day RPC mechanisms.</p></li>
 </ul>
 <h3 id="overview">Overview</h3>
 <p>Remote Procedure Call (RPC) is a general term for executing a subroutine in a different address space without writing the actual code used to perform the remote execution. To provide an example, we can imagine a user wishing to invoke the random number generator function on another machine, but, the only difference between the local and remote invocation is supplying an additional node identifier where it should occur. While not the first implementation, because it was preceded by Apollo Computer’s Network Computing System (NCS), the first major implementation to be widely known and adopted was the SunRPC mechanism, from Sun Microsystems, used to back their Network File System (NFS).</p>
-<p>Remote Procedure Call mechanisms you may be more familiar with are Java’s Remote Method Invocation (RMI), it’s predecessor Modula-3’s Network Objects, XML-RPC, SOAP, CORBA, Avro, Facebook’s, (now Apache) Thrift, Google’s Protocol Buffers, and Twitter’s Finagle.</p>
+<p>Remote Procedure Call mechanisms you may be more familiar with are Java’s Remote Method Invocation (RMI), it’s predecessor Modula-3’s Network Objects, XML-RPC, SOAP, CORBA, Avro, Facebook’s, (now Apache) Thrift, Google’s Protocol Buffers with Stubby, Twitter’s Finagle, and Google’s gRPC.</p>
 <h3 id="rfc-684">RFC 684</h3>
 <blockquote>
 <p>“Rather, we take exception to PCP’s underlying premise: that the procedure calling discipline is the starting point for building multi-computer systems.”</p>
@@ -41,7 +57,7 @@
 </ul>
 <p>Following from these three points, we see a series of concerns develop about this programming paradigm, all of which become a common theme across the 40+ years in RPC’s history. These are:</p>
 <ul>
-<li><p>Difficulty in recovery after malfunction or error. For instance, do we rollback or throw exceptions? How do we handle these errors? Can we just try again?</p></li>
+<li><p>Difficulty in recovery after malfunction or error. For instance, do we rollback or throw exceptions? How do we handle these errors? Can we just try again?<a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a></p></li>
 <li><p>Difficulty in sequencing operations. If all calls are synchronous and some of these calls can fail, it can require a significant amount of code to ensure correct re-execution to preserve order moving forward.</p></li>
 <li><p>Remote Procedure Call forces <strong>synchronous programming</strong>: a method is invoked and the invoking process waits for a response.</p></li>
 <li><p>Backpressure, or blocking on previous actions completing, load-shedding, or dropping messages on the floor when the system is overloaded, and priority servicing become more difficult with the call-and-response model of Remote Procedure Call.</p></li>
@@ -58,6 +74,40 @@
 <p>However, as Vinoski points out in 2003, the evaluation of programming languages and abstractions based on transparency alone is flawed:</p>
 <blockquote>
 <p>“The goal is to merge middleware abstractions directly into the realm of the programming language, minimizing the impedance mismatch between the programming language world and the middleware world. For example, mappings make request invocations on distributed objects and services appear as normal programming-language function calls, and they map distributed system exceptions into native programming language exception-handling mechanisms.” <span class="citation">Vinoski (2003)</span></p>
+</blockquote>
+<h3 id="a-critique-of-the-remote-procedure-call-paradigm">“A Critique of the Remote Procedure Call Paradigm”</h3>
+<blockquote>
+<p>“We propose the following test for a general-purpose RPC system. Imagine that two programmers are working on a project. Programmer 1 is writing the main program. Programmer 2 is writing a collection of procedures to be called by the main program. The subject of RPC has never been mentioned and both programmers assume that all their code will be compiled and linked together into a single executable binary program and run on a free-standing computer, not connected to any networks.”</p>
+<p>“At the very last minute, after all the code has been thoroughly tested, debugged, and documented and both programmers have quit their jobs and left the country, the project management is forced by unexpected, external circumstances to run the program on a distributed system. The main program must run on one computer, and each procedure must run on a different computer. We also assume that all the stub procedures are produced mechanically by a stub generating program.”</p>
+<p>“It is our contention that a large number of things may now go wrong due to the fact that RPC tries to make remote procedure calls look exactly like local ones, but is unable to do it perfectly. Many of the problems can be solved by modifying the code is various ways, but then the transparency is lost. Once we admit that true transparency is impossible, and that programmers must know which calls are remote and which ones are local, we are faced with the question of whether a partially transparent mechanism is really better than one that was designed specifically for remote access and makes no attempt to make remote computations look local at all.“</p>
+</blockquote>
+<p>Tanenbaum and van Renesse directly attack the Remote Procedure Call paradigm stating that it is fundamentally wrong to treat local and remote calls the same. They state that the transparency that RPC tries to achieve is impossible and posit that a protocol that is designed specifically for remote access is better.</p>
+<p>The authors go on to describe an alternative paradigm: a “virtual circuit”. This alternative comes off sounding very similar to Distributed Erlang running with TCP: non-blocking send and receive operations across a sliding-window network protocol.</p>
+<blockquote>
+<p>“An alternative model that does not attempt any transparency in the first place is the virtual circuit model (e.g., the ISO OSI reference model [Zimmermann, 1980]). In this model, a full-duplex virtual circuit using a sliding window protocol is set up between the client and server. If nonblocking SEND and RECEIVE primitives are used, incoming messages can be signalled by interrupts to allow the maximum amount of parallelism between communication and computation.”</p>
+</blockquote>
+<p>Tanenbaum and van Renesse outline many of the same criticisms as RFC 684: latency, lack of parallelism, lack of streaming, exception handling and failure detection. In addition, they raise a few additional criticisms that we will highlight below.</p>
+<h4 id="unexpected-messages">Unexpected Messages</h4>
+<p>With a synchronous call-and-response protocol between client and server, how is one supposed to send a message to the client that is unexpected if that client is not waiting for a message?</p>
+<h4 id="single-threaded-servers">Single Threaded Servers</h4>
+<p>How does one handle the situation where the server does not have a response ready for a client immediately – for instance, if it needs to wait on input from another server? Not only does this block the server, but it also blocks the client from proceeding further with local computation.<a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a></p>
+<blockquote>
+<p>“There is, in fact, no protocol that guarantees that both sides definitely and unambiguously know that the RPC is over in the face of a lossy network.” <span class="citation">Tanenbaum and Renesse (1987)</span></p>
+</blockquote>
+<h4 id="the-two-army-problem">The Two Army Problem</h4>
+<p>How do we handle requesting irreplaceable data? (or, more generally have two servers come to agreement that some RPC was successfully executed and the response received.) Well, we can acknowledge the receipt of that information, but then we would also have to acknowledge the acknowledgements to be sure the acknowledgement was delivered, right? This topic, central to the agreement problem, has been discussed extensively in distributed systems literature <span class="citation">Halpern and Moses (1990)</span>.</p>
+<h4 id="parameters">Parameters</h4>
+<p>Tanenbaum and van Renesse discuss the problem of parameter passing and parameter marshalling. This issue becomes exacerbated with references in object systems such as CORBA, where specific distributed references have to be used to ensure they remain valid over time.</p>
+<blockquote>
+<p>“However, if there are reference parameters or pointers, things are more complicated. While it is obviously possible to copy pointers into the message, when the server tries to use them, it will not work correctly because the object pointed to will not be present.”</p>
+<p>“Two possible solutions suggest themselves, each with major drawbacks. The first solution is to have the client stub not only put the pointer itself in the message, but also the thing pointed to. However, if the thing pointed to is the middle of a complex list structure containing pointers in both directions, sublists, etc., copying the entire structure into the message will be expensive. Furthermore, when it arrives, the structure will have to be reassembled at the same memory addresses that it had on the client side, because the server code will just perform indirection operations on the pointers as though it were working on local variables.”</p>
+<p>...</p>
+<p>“The other solution is just to pass the pointer itself. Every time the pointer is used, a message is sent back to the client to read or write the relevant word. The problem here is that we violate one of the basic rules: the compiler should not have to know that it is dealing with RPC. Normally the code produced for reading from a pointer is just to indirect from it. If remote pointers work differently from local pointers, the transparency of the RPC is lost.”</p>
+</blockquote>
+<h4 id="idempotence">Idempotence</h4>
+<p>Finally, the authors highlight the problem of providing exactly-once semantics across the network and the power of idempotence. Tanenbaum and van Renesse say it very conciesly.</p>
+<blockquote>
+<p>“Suppose a client does a nonidempotent RPC and the server crashes one machine instruction after finishing the operation, but before the server stub has had a chance to reply. The client stub times out and sends the request again. If the server has rebooted by then, there is a chance that the operation will be performed two or more times and thus fail.”</p>
 </blockquote>
 <h3 id="a-note-on-distributed-computing">“A Note On Distributed Computing”</h3>
 <blockquote>
@@ -118,16 +168,16 @@
 <ul>
 <li><p><strong>Interface Definition Languages (IDL) “impedance mismatch”</strong>: base types may be easy to map, but more complex types may be less so.</p></li>
 <li><p><strong>Scalability:</strong> the RPC paradigm does not have any first class support for caching, or mechanisms for mitigating high latency, and is remains a rather primitive operation to build distributed applications with.</p></li>
-<li><p><strong>Representational State Transfer (REST)</strong>: REST is good: it specifically addresses the problem of managing distributed resources; but most frameworks built on top of REST alter the abstraction and present something that repeats the problem <a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>.</p></li>
+<li><p><strong>Representational State Transfer (REST)</strong>: REST is good: it specifically addresses the problem of managing distributed resources; but most frameworks built on top of REST alter the abstraction and present something that repeats the problem <a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a>.</p></li>
 </ul>
 <h2 id="impact-and-implementations">Impact and Implementations</h2>
 <p>Remote Procedure Call (RPC) has been around for a very long time and while many opponents of RPC have been extremely critical of it, it still remains one of the most widely used way of writing distributed applications. There’s an unprecedented amount of use of frameworks for RPC like Google’s Protocol Buffers, and Apache’s Thrift deployed and used in production applications every day.</p>
-<p>Frameworks such as Google’s gRPC for HTTP/2.0 and Twitter’s Finagle continue to reduce the amount of complexity in building applications with them, attempting to bring RPC to an even wider audience. For instance, Twitter’s Finagle is protocol-independent and attempts to deal with the problems of distribution directly. Finagle does this through the use of futures, which allow composition and explicit sequencing; Google’s gRPC does similar. These frameworks claim that since they do not attempt to hide the fact that the calls are remote, that it provides a better abstraction. However, now we have returned to the aforementioned problem of soft mounting in NFS: explicitly handling the flow control from the array of possible network exceptions that could occur, though mitigated through the use of promises/futures <a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a>.</p>
+<p>Frameworks such as Google’s gRPC for HTTP/2.0 and Twitter’s Finagle continue to reduce the amount of complexity in building applications with them, attempting to bring RPC to an even wider audience. For instance, Twitter’s Finagle is protocol-independent and attempts to deal with the problems of distribution directly. Finagle does this through the use of futures, which allow composition and explicit sequencing; Google’s gRPC does similar. These frameworks claim that since they do not attempt to hide the fact that the calls are remote, that it provides a better abstraction. However, now we have returned to the aforementioned problem of soft mounting in NFS: explicitly handling the flow control from the array of possible network exceptions that could occur, though mitigated through the use of promises/futures <a href="#fn5" class="footnoteRef" id="fnref5"><sup>5</sup></a>.</p>
 <p>But, the question we have to ask ourselves is whether the abstraction of an individual method invocation or function call is the correct paradigm for building distributed applications. Is the idea of treating all remote objects as local, and making distribution as transparent as possible, the correct decision moving forward? Does it mask failure modes that will allow developers to build applications that will not operate correctly under partial failure?</p>
 <p>When we talk about distributed programming languages today, many developers equate this to <strong>programming languages</strong> that can be, and have been used, to build <strong>distributed systems.</strong> For example, any language with concurrency primitives and the ability to open a network socket would suffice to build these systems; this does not imply that these languages are distributed programming languages.</p>
 <p>But, a <strong>distributed programming language</strong> is where the distribution is <strong>first class</strong>. Languages like Go are more closely related to <strong>concurrent</strong> languages, where concurrency is first class; and, while concurrency is a requirement for distribution, these are different topics. CORBA is an example of trying to make distribution first class in languages such as C++.</p>
 <p>Erlang <span class="citation">Claessen and Svensson (2005; Svensson and Fredlund 2007a; Svensson and Fredlund 2007b)</span> is one language where distribution is first class. Erlang has a RPC mechanism, but prefers the use of asynchronous message passing between processes. In fact, the RPC mechanism in Erlang is implemented using Erlang’s native asynchronous message passing. While you can peek under the covers and see <strong>where</strong> processes are running, Erlang tries to make the programmer assume that each process could be executing on a different node. Motivated by the expressiveness of the design, both Distributed Process, from the Cloud Haskell group, and Akka, in Scala, are examples that attempt to bring Erlang-style semantics to Haskell and Scala, respectively.</p>
-<p>One approach taken in the Scala community for distributed programming is serializable closures <span class="citation">Miller, Haller, and Odersky (2014)</span>, or what’s known as the function shipping paradigm. In this model, entire functions are moved across the network, where the type system is used to ensure that all of values in scope can be properly serialized or marshalled as these closures move across the network. While this solves some of the problematic points in systems like CORBA and DCOM, it does not have a solution for the problem of how to ensure exacty-once execution of functions, or to handle partial failure where you can not distinguish the failure of the remote node from the network.</p>
+<p>One approach taken in the Scala community for distributed programming is serializable closures <span class="citation">Miller, Haller, and Odersky (2014)</span>, or what’s known as the function shipping paradigm. In this model, entire functions are moved across the network, where the type system is used to ensure that all of values in scope can be properly serialized or marshalled as these closures move across the network. While this solves some of the problematic points in systems like CORBA and DCOM, it does not have a solution for the problem of how to ensure exactly-once execution of functions, or to handle partial failure where you can not distinguish the failure of the remote node from the network.</p>
 <p>Languages like Bloom, and Bloom<sub>L</sub>, and Lasp <span class="citation">Alvaro et al. (2011; Conway et al. 2012; Meiklejohn and Van Roy 2015)</span> take an alternative approach: can we build abstractions that rely on asynchronous programming, very weak ordering and structuring our applications in such a way where they are tolerant to network anomalies such as message duplication and message re-ordering. While this approach is more expensive in terms of state transmission, and more restrictive in what types of computations can be expressed, this style of programming supports the creation of <em>correct-by-construction</em> distributed applications. These applications are highly tolerant to anomalies resulting from network failures by assuming all actors in the system are distributed. The restrictions, however, might prohibit wide adoption of these techniques.</p>
 <p>So, we ask again:</p>
 <blockquote>
@@ -137,14 +187,32 @@
 <div id="ref-alvaro2011consistency">
 <p>Alvaro, Peter, Neil Conway, Joseph M Hellerstein, and William R Marczak. 2011. “Consistency Analysis in Bloom: A CALM and Collected Approach.” In <em>CIDR</em>, 249–60. Citeseer.</p>
 </div>
+<div id="ref-birrell1984implementing">
+<p>Birrell, Andrew D, and Bruce Jay Nelson. 1984. “Implementing Remote Procedure Calls.” <em>ACM Transactions on Computer Systems (TOCS)</em> 2 (1). ACM: 39–59.</p>
+</div>
+<div id="ref-1702134">
+<p>Black, A., N. Hutchinson, E. Jul, H. Levy, and L. Carter. 1987. “Distribution and Abstract Types in Emerald.” <em>IEEE Transactions on Software Engineering</em> SE-13 (1): 65–76. doi:<a href="https://doi.org/10.1109/TSE.1987.232836">10.1109/TSE.1987.232836</a>.</p>
+</div>
 <div id="ref-claessen2005semantics">
 <p>Claessen, Koen, and Hans Svensson. 2005. “A Semantics for Distributed Erlang.” In <em>Proceedings of the 2005 ACM SIGPLAN Workshop on Erlang</em>, 78–87. ACM.</p>
 </div>
 <div id="ref-conway2012logic">
 <p>Conway, Neil, William R Marczak, Peter Alvaro, Joseph M Hellerstein, and David Maier. 2012. “Logic and Lattices for Distributed Programming.” In <em>Proceedings of the Third ACM Symposium on Cloud Computing</em>, 1. ACM.</p>
 </div>
+<div id="ref-halpern1990knowledge">
+<p>Halpern, Joseph Y, and Yoram Moses. 1990. “Knowledge and Common Knowledge in a Distributed Environment.” <em>Journal of the ACM (JACM)</em> 37 (3). ACM: 549–87.</p>
+</div>
 <div id="ref-kendall1994note">
 <p>Kendall, Samuel C, Jim Waldo, Ann Wollrath, and Geoff Wyant. 1994. “A Note on Distributed Computing.” Sun Microsystems, Inc.</p>
+</div>
+<div id="ref-lee2015implementing">
+<p>Lee, Collin, Seo Jin Park, Ankita Kejriwal, Satoshi Matsushita, and John Ousterhout. 2015. “Implementing Linearizability at Large Scale and Low Latency.” In <em>Proceedings of the 25th Symposium on Operating Systems Principles</em>, 71–86. ACM.</p>
+</div>
+<div id="ref-liskov1988distributed">
+<p>Liskov, Barbara. 1988. “Distributed Programming in Argus.” <em>Communications of the ACM</em> 31 (3). ACM: 300–312.</p>
+</div>
+<div id="ref-liskov1988promises">
+<p>Liskov, Barbara, and Liuba Shrira. 1988. <em>Promises: Linguistic Support for Efficient Asynchronous Procedure Calls in Distributed Systems</em>. Vol. 23. 7. ACM.</p>
 </div>
 <div id="ref-meiklejohn2015lasp">
 <p>Meiklejohn, Christopher, and Peter Van Roy. 2015. “Lasp: A Language for Distributed, Eventually Consistent Computations with CRDTs.” In <em>Proceedings of the First Workshop on Principles and Practice of Consistency for Distributed Data</em>, 7. ACM.</p>
@@ -158,17 +226,26 @@
 <div id="ref-svensson2007programming">
 <p>Svensson, Hans, and Lars-Åke Fredlund. 2007b. “Programming Distributed Erlang Applications: Pitfalls and Recipes.” In <em>Proceedings of the 2007 SIGPLAN Workshop on ERLANG Workshop</em>, 37–42. ACM.</p>
 </div>
+<div id="ref-tanenbaum1987critique">
+<p>Tanenbaum, Andrew Stuart, and Robbert van Renesse. 1987. <em>A Critique of the Remote Procedure Call Paradigm</em>. Vrije Universiteit, Subfaculteit Wiskunde en Informatica.</p>
+</div>
 <div id="ref-vinoski2003s">
 <p>Vinoski, Steve. 2003. “It’s Just a Mapping Problem [Computer Application Adaptation].” <em>Internet Computing, IEEE</em> 7 (3). IEEE: 88–90.</p>
 </div>
 <div id="ref-vinoski2008convenience">
 <p>———. 2008. “Convenience over Correctness.” <em>Internet Computing, IEEE</em> 12 (4). IEEE: 89–92.</p>
 </div>
+<div id="ref-wollrath1996distributed">
+<p>Wollrath, Ann, Roger Riggs, and Jim Waldo. 1996. “A Distributed Object Model for the Java TM System.” In <em>Proceedings of the 2nd Conference on USENIX Conference on Object-Oriented Technologies (COOTS)-Volume 2</em>, 17–17. USENIX Association.</p>
+</div>
 </div>
 <div class="footnotes">
 <hr />
 <ol>
-<li id="fn1"><p>For instance, if one was to build an object model on top of REST.<a href="#fnref1">↩</a></p></li>
-<li id="fn2"><p>Our related post on promises and futures challenges whether that abstraction is right either.<a href="#fnref2">↩</a></p></li>
+<li id="fn1"><p>Fun fact: BBN’s Internet division would later become Genuity and then Level3 out of bankruptcy and has autonomous system number 1 (ASN 1).<a href="#fnref1">↩</a></p></li>
+<li id="fn2"><p>Some systems that attempt to address this include Liskov’s promises <span class="citation">Liskov and Shrira (1988)</span> and Lee’s <span class="citation">Lee et al. (2015)</span> work on a reusable framework for linearizability.<a href="#fnref2">↩</a></p></li>
+<li id="fn3"><p>Our section on promises talks about this problem in depth <span class="citation">Liskov (1988)</span>.<a href="#fnref3">↩</a></p></li>
+<li id="fn4"><p>For instance, if one was to build an object model on top of REST.<a href="#fnref4">↩</a></p></li>
+<li id="fn5"><p>Our related post on promises and futures challenges whether that abstraction is right either.<a href="#fnref5">↩</a></p></li>
 </ol>
 </div>
