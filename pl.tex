@@ -19,6 +19,15 @@
 \usepackage{hyperref}
 \usepackage{breakurl}
 
+\usepackage{textcomp}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyfoot{}
+\fancyfoot[LE,LO]{MY TEXT}
+\renewcommand{\footrulewidth}{0.4pt}
+\fancyfoot[L]{Programming Models and Languages for Distributed Computation\\ \textcopyright\ 2016 Christopher S. Meiklejohn}
+
 \usepackage{cleveref}
 \crefname{section}{§}{§§}
 \Crefname{section}{§}{§§}
@@ -94,10 +103,11 @@
 \author{Christopher S. Meiklejohn\\
   Universit\'e catholique de Louvain\\
   Louvain-la-Neuve, Belgium\\
-  \texttt{christopher.meiklejohn@gmail.com}}
+  \texttt{christopher.meiklejohn@uclouvain.be}}
   
 \date{\today}
 \maketitle
+\clearpage
 
 \tableofcontents
 
