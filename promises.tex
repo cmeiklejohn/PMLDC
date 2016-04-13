@@ -19,8 +19,6 @@ An excerpt motivation from \textit{Promises: linguistic support for efficient as
 
 The general motivation behind the work by Liskov and Shrira can be thought as the following critiques of two models of distributed programming.
 \begin{itemize}
-    %% TODO: Possible citation for RPC.
-	%% TODO: Possible *MOD or Plilts reference should be placed here.
 	\item The Remote Procedure Call (RPC) paradigm is preferable by programmers because it is a familiar programming model.  However, because of the synchronous nature of RPC, this model does not scale in terms of performance.
 	\item The message passing paradigm is harder for programmers to reason about, but provides the benefit of decoupling of request and response, allowing for asynchronous programming and the subsequent performance benefits.
 \end{itemize}
@@ -37,18 +35,4 @@ While promises originated as a technique for decoupling values from the computat
 
 The Oz~\cite{henz1993oz} language, designed for the education of programmers in several different programming paradigms, provides a functional programming model with single assignment variables, streams, and promises.  Given every variable in Oz is a dataflow, and therefore every single value in the system is a promise.  Both Distributed Oz~\cite{haridi1997overview} and Derflow (an implementation of Oz in the Erlang programming language)~\cite{Bravo:2014:DDD:2633448.2633451} provide distributed versions of the Oz programming model.  The Akka library for Scala also provides Oz-style dataflow concurrency with Futures.
 
-More recently, promises have been repurposed by the JavaScript community to allow for asynchronous programs to be written in direct style instead of continuation-passing style.  ECMAScript 6 contains a native Promise object, that can be used to perform asynchronous computation and register callback functions that will fire once the computation either succeeds or fails~\cite{wiki:futures}. 
-
-%% TODO: Cite Lasp and LVars
-%% TODO: Cite Oz, Distributed Oz, and Derflow.
-%% TODO: Add Alice, E.
-
-%% call-streams: combination of rpc and message passing: async of message passing with procedure focus of rpc
-%% Order preservation, regardless of call execution time
-%% RPC the preferred programming paradigm
-%% Futures in MultiLisp
-%% "Extended futures": strongly typed, no runtime checking to distinguish values, correct propagation of errors, integrated into the "call-stream" abstraction and understand node partitions and network failures.
-
-%% Stream compositions
-
-%% TODO: Finish this section.
+More recently, promises have been repurposed by the JavaScript community to allow for asynchronous programs to be written in direct style instead of continuation-passing style.  ECMAScript 6 contains a native Promise object, that can be used to perform asynchronous computation and register callback functions that will fire once the computation either succeeds or fails~\cite{wiki:futures}.

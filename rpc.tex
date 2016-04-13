@@ -1,14 +1,5 @@
 \subsection{Relevant Reading}
 
-%% TODO: Cite The isis project: Real experience with a fault tolerant programming system.
-%% TODO: Cite Exploiting virtual synchrony in distributed systems.
-%% TODO: Implementing remote procedure calls.
-%% TODO: Distribution and abstract types in emerald.
-%% TODO: Using time instead of timeout for fault-tolerant distributed systems.
-%% TODO: Distributed programming in argus.
-%% TODO: Implementing fault-tolerant services using the state machine approach: A tutorial
-%% TODO: A distributed object model for the java system.
-
 \begin{itemize}
 	\item \textit{A Note On Distributed Computing}, Kendall, Waldo, Wollrath, Wyant, 1994~\cite{kendall1994note}.
 	\item \textit{It's Just A Mapping Problem}, Vinoski, 2003~\cite{vinoski2003s}.
@@ -25,38 +16,38 @@
 
 \begin{itemize}
 
-\item{1974:} RFC 674, \\ ``Procedure Call Protocol Documents, Version 2''
+\item{1974:} RFC 674, \\ ``Procedure Call Protocol Documents, Version 2'' \\
+	RFC 674 attempts to define a general way to share resources across \textbf{all 70 nodes} of the Internet.  This work is performed at Bolt, Beranek and Newman (BBN Technologies).\footnote{BBN's Internet division would later become Genuity and then Level3 out of bankruptcy and has autonomous system number 1 (ASN 1).}
 
-\item{1975:} RFC 684, \\ ``A Commentary on Procedure Calling as a Network Protocol''
-%% 1975, RPC 684, share resources with all 70 notes of the internet - Bolt, Barek and Newman, later Genuity, which has ASN 1 and is one of the oldest functioning networks of the internet
-%% basically states the problem about distributed systems *then*, but we haven't learned in 30+ years "deja-vu", never get it right, leaky abstraction
+\item{1975:} RFC 684, \\ ``A Commentary on Procedure Calling as a Network Protocol'' \\
+	First outlines the problems of RPC and how they related to fundamental problems in distributed systems.
 
-\item{1976:} RFC 707, \\ ``A High-Level Framework for Network-Based Resource Sharing''
-%% RFC 707 defines a protocol that we want -- discusses telnet and how we can "mechanize" it
+\item{1976:} RFC 707, \\ ``A High-Level Framework for Network-Based Resource Sharing'' \\
+	An attempt to ``mechanize'' the TELNET and FTP protocols through a generalization to functions.
 
-\item{1984:} ``Implementing Remote Procedure Calls''
-%% 1984: sunrpc defined
+\item{1984:} ``Implementing Remote Procedure Calls''~\cite{birrell1984implementing} \\
+	In this work, the \textbf{sunrpc} mechanism is defined.
 
-\item{1987:} Distribution and Abstract Types in Emerald
-%% VMS programming language; types for distributed computing, call by move, calling conventions, copy the data on the wire, first use of distributed objects.
+\item{1987:} Distribution and Abstract Types in Emerald~\cite{1702134} \\
+	One of the first major implementations of distributed objects containing distribution-specific calling conventions, such as \textit{call-by-move}.
 
-\item{1988:} Distributed Programing in Argus
-%% barbara liskov, "guardians" moves between nodes, resurrect on failed nodes; atomicity through the guardians, coordination with rollback, each function is going to have a rollback mechanism
+\item{1988:} Distributed Programing in Argus~\cite{liskov1988distributed} \\
+	In Argus, atomic units of computation referred to as ``guardians'' coordinate application of effects and rollback.
 
-\item{1988:} RFC 1057, \\ ``Remote Procedure Call Protocol Specification, Version 2''
-%% defines sunrpc as a standard, make a function call across the network, portmap, etc.  used for NFS.
+\item{1988:} RFC 1057, \\ ``Remote Procedure Call Protocol Specification, Version 2'' \\
+	Defines \textbf{sunrpc} as a standard along with its supporting infrastructure, such as portmapper, that's used in the creation of NFS.
 
-\item{1991:} CORBA 1.0
-%% distributed objects
+\item{1991:} CORBA 1.0 \\
+	CORBA 1.0 introduces distributed objects.
 
-\item{1996:} ``A Distributed Object Model for the Java System''
-%% corba, waldo, introduces RMI (oak story, etc.)
+\item{1996:} ``A Distributed Object Model for the Java System''~\cite{wollrath1996distributed} \\
+	Introduces the Java RMI system.
 
-\item{1997:} CORBA 2.0
-%% major corba release
+\item{1997:} CORBA 2.0 \\
+	CORBA 2.0 represents the major release of CORBA that most people are familiar with.
 
-\item{1999+:} EJB, XML-RPC, SOAP, REST
-%% modern day standardized RPC mechanisms
+\item{1999-:} EJB, XML-RPC, SOAP, REST, Thrift, Finagle, gRPC, etc. \\
+	Modern day RPC mechanisms.
 
 \end{itemize}
 
@@ -83,8 +74,7 @@ RFC 684 is commentary on RFC 674 that introduced the Procedure Call Paradigm, Ve
 Following from these three points, we see a series of concerns develop about this programming paradigm, all of which become a common theme across the 40+ years in RPC's history.  These are:
 
 \begin{itemize}
-	\item Difficulty in recovery after malfunction or error.  For instance, do we rollback or throw exceptions?  How do we handle these errors?  Can we just try again?  
-	%% TODO: Ousterhaut's RFIL, Liskov's Promises.
+	\item Difficulty in recovery after malfunction or error.  For instance, do we rollback or throw exceptions?  How do we handle these errors?  Can we just try again?\footnote{Some systems that attempt to address this include Liskov's promises~\cite{liskov1988promises} and Lee's \cite{lee2015implementing} work on a reusable framework for linearizability.}
 	\item Difficulty in sequencing operations.  If all calls are synchronous and some of these calls can fail, it can require a significant amount of code to ensure correct re-execution to preserve order moving forward. 
 	\item Remote Procedure Call forces \textbf{synchronous programming}: a method is invoked and the invoking process waits for a response.
 	\item Backpressure, or blocking on previous actions completing, load-shedding, or dropping messages on the floor when the system is overloaded, and priority servicing become more difficult with the call-and-response model of Remote Procedure Call.
@@ -100,16 +90,10 @@ RFC 707 generalizes the ideas from RFC 684 and discusses the problem of resource
 
 While we can, the problems of control flow and priority servicing outlined in RFC 684 remain; however, not enough that it prevents this model from being adopted by many systems in the future.
 
-%% TODO: Emerald and objects needs to go before this.
-
 \subsubsection{CORBA}
-
-%% replicated objects: state machine replication, ISIS, virtual synchrony
-%% live objects: distinct identities, encapsulate their own state, CORBA, DCOM
 
 The Common Object Request Broker Architecture (CORBA) is an abstraction for object-oriented languages, popularized by C++, that allows you to communicate between different languages and different address spaces running on different machines.  CORBA relied on the use of an Interface Definition Language (IDL) for specifying the interfaces of remote classes of objects; this IDL was used to generate stubs of what the remote systems object interfaces appeared as on the local machine.  These IDL's would be used to generate mappings between the abstract interfaces provided by the IDL's and the actual implementations in languages such as C++ and Java.
 
-%% TODO: Add citation.
 CORBA attempted to provide several benefits to the application developer: language independence, OS-independence, architecture-independence, static typing through a mapping of abstract types in the IDL to machine and language specific implementations of those types, and object transfer, where objects can be migrated  over the wire between different machines.  CORBA's promise was that through the use of mapping that remote calls could appear as local calls, and that distributed systems related exceptions could be mapped into local exceptions and handled by local exception handling mechanisms.  
 
 However, as Vinoski points out in 2003, the evaluation of programming languages and abstractions based on transparency alone is flawed:
@@ -125,12 +109,6 @@ However, as Vinoski points out in 2003, the evaluation of programming languages 
 \end{quote}
 
 In this pinnacle Waldo paper, they argue that "it is perilous to ignore the differences" between local and distributed computing and that the unified view of objects is flawed.~\cite{kendall1994note}  They cite two independent groups of work, the systems of Emerald and Argus, and the modern equivalents of those systems, Microsoft's DCOM and OMG's CORBA: all systems that  extended the RPC mechanism to objects and method invocation.
-
-%Objects have interfaces defined by the IDL
-%The RPC mechanism is extended to objects and method invocation
-%Abstracts over how the remote call will actually be issued -- programmer doesn't see the communication or perform the binding
-%Local and remote calls are just not the same!
-%But, we've already know all this!
 
 We can summarize the ``promise'' of the unified view of objects, as Waldo does in the paper.
 
@@ -236,5 +214,3 @@ So, we ask again:
 \begin{quote}
 ``Does developer convenience really trump correctness, scalability,performance, separation of concerns, extensibility, and accidentalcomplexity?''~\cite{vinoski2008convenience}
 \end{quote}
-
-\clearpage
