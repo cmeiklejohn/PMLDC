@@ -1,6 +1,7 @@
 \subsection{Relevant Reading}
 
 \begin{itemize}
+	\item \textit{A Critique of the Remote Procedure Call Paradigm}, Tanenbaum and van Renesse, 1987~\cite{tanenbaum1987critique}.
 	\item \textit{A Note On Distributed Computing}, Kendall, Waldo, Wollrath, Wyant, 1994~\cite{kendall1994note}.
 	\item \textit{It's Just A Mapping Problem}, Vinoski, 2003~\cite{vinoski2003s}.
 	\item \textit{Convenience Over Correctness}, Vinoski, 2008~\cite{vinoski2008convenience}.
@@ -17,7 +18,7 @@
 \begin{itemize}
 
 \item{1974:} RFC 674, \\ ``Procedure Call Protocol Documents, Version 2'' \\
-	RFC 674 attempts to define a general way to share resources across \textbf{all 70 nodes} of the Internet.  This work is performed at Bolt, Beranek and Newman (BBN Technologies).\footnote{BBN's Internet division would later become Genuity and then Level3 out of bankruptcy and has autonomous system number 1 (ASN 1).}
+	RFC 674 attempts to define a general way to share resources across \textbf{all 70 nodes} of the Internet.  This work is performed at Bolt, Beranek and Newman (BBN Technologies).\footnote{Fun fact: BBN's Internet division would later become Genuity and then Level3 out of bankruptcy and has autonomous system number 1 (ASN 1).}
 
 \item{1975:} RFC 684, \\ ``A Commentary on Procedure Calling as a Network Protocol'' \\
 	First outlines the problems of RPC and how they related to fundamental problems in distributed systems.
@@ -30,6 +31,9 @@
 
 \item{1987:} Distribution and Abstract Types in Emerald~\cite{1702134} \\
 	One of the first major implementations of distributed objects containing distribution-specific calling conventions, such as \textit{call-by-move}.
+	
+\item{1987:} A Critique of the Remote Procedure Call Paradigm~\cite{tanenbaum1987critique} \\
+	Tanenbaum and van Renesse provide a criticism, similar to the one in RFC 684, on why the RPC model is the wrong model for distributed computing.
 
 \item{1988:} Distributed Programing in Argus~\cite{liskov1988distributed} \\
 	In Argus, atomic units of computation referred to as ``guardians'' coordinate application of effects and rollback.
@@ -39,8 +43,11 @@
 
 \item{1991:} CORBA 1.0 \\
 	CORBA 1.0 introduces distributed objects.
+	
+\item{1994:} A Note On Distributed Computing~\cite{kendall1994note} \\
+	Kendall et al.\ also talk in great length about why the RPC model, extended to objects, is problematic.
 
-\item{1996:} ``A Distributed Object Model for the Java System''~\cite{wollrath1996distributed} \\
+\item{1996:} A Distributed Object Model for the Java System~\cite{wollrath1996distributed} \\
 	Introduces the Java RMI system.
 
 \item{1997:} CORBA 2.0 \\
@@ -100,6 +107,52 @@ However, as Vinoski points out in 2003, the evaluation of programming languages 
 
 \begin{quote}
 ``The goal is to merge middleware abstractions directly into the realm of the programming language, minimizing the impedance mismatch between the programming language world and the middleware world. For example, mappings make request invocations on distributed objects and services appear as normal programming-language function calls, and they map distributed system exceptions into native programming language exception-handling mechanisms.''~\cite{vinoski2003s}
+\end{quote}
+
+\subsubsection{``A Critique of the Remote Procedure Call Paradigm''}
+
+\begin{quote}
+``We propose the following test for a general-purpose RPC system. Imagine that two programmers are working on a project. Programmer 1 is writing the main program. Programmer 2 is writing a collection of procedures to be called by the main program. The subject of RPC has never been mentioned and both programmers assume that all their code will be compiled and linked together into a single executable binary program and run on a free-standing computer, not connected to any networks.''	
+
+``At the very last minute, after all the code has been thoroughly tested, debugged, and documented and both programmers have quit their jobs and left the country, the project management is forced by unexpected, external circumstances to run the program on a distributed system. The main program must run on one computer, and each procedure must run on a different computer. We also assume that all the stub procedures are produced mechanically by a stub generating program.''
+
+``It is our contention that a large number of things may now go wrong due to the fact that RPC tries to make remote procedure calls look exactly like local ones, but is unable to do it perfectly. Many of the problems can be solved by modifying the code is various ways, but then the transparency is lost. Once we admit that true transparency is impossible, and that programmers must know which calls are remote and which ones are local, we are faced with the question of whether a partially transparent mechanism is really better than one that was designed specifically for remote access and makes no attempt to make remote computations look local at all.``
+\end{quote}
+
+Tanenbaum and van Renesse directly attack the Remote Procedure Call paradigm stating that it is fundamentally wrong to treat local and remote calls the same.  They state that the transparency that RPC tries to achieve is impossible and posit that a protocol that is designed specifically for remote access is better.
+
+The authors go on to describe an alternative paradigm: a ``virtual circuit''.  This alternative comes off sounding very similar to Distributed Erlang running with TCP: non-blocking send and receive operations across a sliding-window network protocol.
+
+\begin{quote}
+``An alternative model that does not attempt any transparency in the first place is the virtual circuit model (e.g., the ISO OSI reference model [Zimmermann, 1980]). In this model, a full-duplex virtual circuit using a sliding window protocol is set up between the client and server. If nonblocking SEND and RECEIVE primitives are used, incoming messages can be signalled by interrupts to allow the maximum amount of parallelism between communication and computation.''
+\end{quote}
+
+Tanenbaum and van Renesse outline many of the same criticisms as RFC 684: latency, lack of parallelism, lack of streaming, exception handling and failure detection.  In addition, they raise a few additional criticisms that we will highlight below.
+
+\paragraph{Unexpected Messages} With a synchronous call-and-response protocol between client and server, how is one supposed to send a message to the client that is unexpected if that client is not waiting for a message?
+\paragraph{Single Threaded Servers} How does one handle the situation where the server does not have a response ready for a client immediately -- for instance, if it needs to wait on input from another server?  Not only does this block the server, but it also blocks the client from proceeding further with local computation.\footnote{Our section on promises talks about this problem in depth~\cite{liskov1988distributed}.}
+
+\begin{quote}
+``There is, in fact, no protocol that guarantees that both sides definitely and unambiguously know that the RPC is over in the face of a lossy network.''~\cite{tanenbaum1987critique}
+\end{quote}
+
+\paragraph{The Two Army Problem} How do we handle requesting irreplaceable data?  (or, more generally have two servers come to agreement that some RPC was successfully executed and the response received.) Well, we can acknowledge the receipt of that information, but then we would also have to acknowledge the acknowledgements to be sure the acknowledgement was delivered, right?  This topic, central to the agreement problem, has been discussed extensively in distributed systems literature~\cite{halpern1990knowledge}.
+
+Tanenbaum and van Renesse discuss the problem of parameter passing and parameter marshalling.  This issue becomes exacerbated with references in object systems such as CORBA, where specific distributed references have to be used to ensure they remain valid over time.
+
+\begin{quote}
+``However, if there are reference parameters or pointers, things are more complicated.  While it is obviously possible to copy pointers into the message, when the server tries to use them, it will not work correctly because the object pointed to will not be present.''
+``Two possible solutions suggest themselves, each with major drawbacks. The first solution is to have the client stub not only put the pointer itself in the message, but also the thing pointed to. However, if the thing pointed to is the middle of a complex list structure containing pointers in both directions, sublists, etc., copying the entire structure into the message will be expensive. Furthermore, when it arrives, the structure will have to be reassembled at the same memory addresses that it had on the client side, because the server code will just perform indirection operations on the pointers as though it were working on local variables.''
+
+...
+
+``The other solution is just to pass the pointer itself. Every time the pointer is used, a message is sent back to the client to read or write the relevant word. The problem here is that we violate one of the basic rules: the compiler should not have to know that it is dealing with RPC. Normally the code produced for reading from a pointer is just to indirect from it. If remote pointers work differently from local pointers, the transparency of the RPC is lost.''
+\end{quote}
+
+Finally, they highlight the problem of exactly-once semantics and the power of idempotence.
+
+\begin{quote}
+``Suppose a client does a nonidempotent RPC and the server crashes one machine instruction after finishing the operation, but before the server stub has had a chance to reply. The client stub times out and sends the request again. If the server has rebooted by then, there is a chance that the operation will be performed two or more times and thus fail.''
 \end{quote}
 
 \subsubsection{``A Note On Distributed Computing''}
