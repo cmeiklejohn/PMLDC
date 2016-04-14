@@ -97,18 +97,6 @@ RFC 707 generalizes the ideas from RFC 684 and discusses the problem of resource
 
 While we can, the problems of control flow and priority servicing outlined in RFC 684 remain; however, not enough that it prevents this model from being adopted by many systems in the future.
 
-\subsubsection{CORBA}
-
-The Common Object Request Broker Architecture (CORBA) is an abstraction for object-oriented languages, popularized by C++, that allows you to communicate between different languages and different address spaces running on different machines.  CORBA relied on the use of an Interface Definition Language (IDL) for specifying the interfaces of remote classes of objects; this IDL was used to generate stubs of what the remote systems object interfaces appeared as on the local machine.  These IDL's would be used to generate mappings between the abstract interfaces provided by the IDL's and the actual implementations in languages such as C++ and Java.
-
-CORBA attempted to provide several benefits to the application developer: language independence, OS-independence, architecture-independence, static typing through a mapping of abstract types in the IDL to machine and language specific implementations of those types, and object transfer, where objects can be migrated  over the wire between different machines.  CORBA's promise was that through the use of mapping that remote calls could appear as local calls, and that distributed systems related exceptions could be mapped into local exceptions and handled by local exception handling mechanisms.  
-
-However, as Vinoski points out in 2003, the evaluation of programming languages and abstractions based on transparency alone is flawed:
-
-\begin{quote}
-``The goal is to merge middleware abstractions directly into the realm of the programming language, minimizing the impedance mismatch between the programming language world and the middleware world. For example, mappings make request invocations on distributed objects and services appear as normal programming-language function calls, and they map distributed system exceptions into native programming language exception-handling mechanisms.''~\cite{vinoski2003s}
-\end{quote}
-
 \subsubsection{``A Critique of the Remote Procedure Call Paradigm''}
 
 \begin{quote}
@@ -149,10 +137,22 @@ Tanenbaum and van Renesse outline many of the same criticisms as RFC 684: latenc
 ``The other solution is just to pass the pointer itself. Every time the pointer is used, a message is sent back to the client to read or write the relevant word. The problem here is that we violate one of the basic rules: the compiler should not have to know that it is dealing with RPC. Normally the code produced for reading from a pointer is just to indirect from it. If remote pointers work differently from local pointers, the transparency of the RPC is lost.''
 \end{quote}
 
-\paragraph{Idempotence} Finally, the authors highlight the problem of providing exactly-once semantics across the network and the power of idempotence.  Tanenbaum and van Renesse say it very conciesly.
+\paragraph{Idempotence} Finally, the authors highlight the problem of providing exactly-once semantics across the network and the power of idempotence.  Tanenbaum and van Renesse say it very concisely.
 
 \begin{quote}
 ``Suppose a client does a nonidempotent RPC and the server crashes one machine instruction after finishing the operation, but before the server stub has had a chance to reply. The client stub times out and sends the request again. If the server has rebooted by then, there is a chance that the operation will be performed two or more times and thus fail.''
+\end{quote}
+
+\subsubsection{CORBA}
+
+The Common Object Request Broker Architecture (CORBA) is an abstraction for object-oriented languages, popularized by C++, that allows you to communicate between different languages and different address spaces running on different machines.  CORBA relied on the use of an Interface Definition Language (IDL) for specifying the interfaces of remote classes of objects; this IDL was used to generate stubs of what the remote systems object interfaces appeared as on the local machine.  These IDL's would be used to generate mappings between the abstract interfaces provided by the IDL's and the actual implementations in languages such as C++ and Java.
+
+CORBA attempted to provide several benefits to the application developer: language independence, OS-independence, architecture-independence, static typing through a mapping of abstract types in the IDL to machine and language specific implementations of those types, and object transfer, where objects can be migrated  over the wire between different machines.  CORBA's promise was that through the use of mapping that remote calls could appear as local calls, and that distributed systems related exceptions could be mapped into local exceptions and handled by local exception handling mechanisms.  
+
+However, as Vinoski points out in 2003, the evaluation of programming languages and abstractions based on transparency alone is flawed:
+
+\begin{quote}
+``The goal is to merge middleware abstractions directly into the realm of the programming language, minimizing the impedance mismatch between the programming language world and the middleware world. For example, mappings make request invocations on distributed objects and services appear as normal programming-language function calls, and they map distributed system exceptions into native programming language exception-handling mechanisms.''~\cite{vinoski2003s}
 \end{quote}
 
 \subsubsection{``A Note On Distributed Computing''}
