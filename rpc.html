@@ -21,7 +21,7 @@ First outlines the problems of RPC and how they related to fundamental problems 
 “A High-Level Framework for Network-Based Resource Sharing”<br />
 An attempt to “mechanize” the TELNET and FTP protocols through a generalization to functions.</p></li>
 <li><p><span>1984:</span> “Implementing Remote Procedure Calls” <span class="citation">Birrell and Nelson (1984)</span><br />
-In this work, the <strong>sunrpc</strong> mechanism is defined.</p></li>
+In this work, the <strong>Cedar RPC</strong> mechanism is designed at Xerox PARC.</p></li>
 <li><p><span>1987:</span> Distribution and Abstract Types in Emerald <span class="citation">Black et al. (1987)</span><br />
 One of the first major implementations of distributed objects containing distribution-specific calling conventions, such as <em>call-by-move</em>.</p></li>
 <li><p><span>1987:</span> A Critique of the Remote Procedure Call Paradigm <span class="citation">Tanenbaum and Renesse (1987)</span><br />
@@ -68,18 +68,11 @@ Modern day RPC mechanisms.</p></li>
 </blockquote>
 <p>RFC 707 generalizes the ideas from RFC 684 and discusses the problem of resources sharing for services such as TELNET and FTP: each of these services presents a <em>different</em> interface for interacting with it, which requires the operator to know the specific protocol for interacting with that service. In realizing that both services like TELNET and FTP follow the call-and-response model, the authors propose an alternative idea: rather than needing to know all of the available commands and protocols on the remote machine, can we define a generic interface for executing a remote procedure that takes an argument list and follows the call-and-response model?</p>
 <p>While we can, the problems of control flow and priority servicing outlined in RFC 684 remain; however, not enough that it prevents this model from being adopted by many systems in the future.</p>
-<h3 id="corba">CORBA</h3>
-<p>The Common Object Request Broker Architecture (CORBA) is an abstraction for object-oriented languages, popularized by C++, that allows you to communicate between different languages and different address spaces running on different machines. CORBA relied on the use of an Interface Definition Language (IDL) for specifying the interfaces of remote classes of objects; this IDL was used to generate stubs of what the remote systems object interfaces appeared as on the local machine. These IDL’s would be used to generate mappings between the abstract interfaces provided by the IDL’s and the actual implementations in languages such as C++ and Java.</p>
-<p>CORBA attempted to provide several benefits to the application developer: language independence, OS-independence, architecture-independence, static typing through a mapping of abstract types in the IDL to machine and language specific implementations of those types, and object transfer, where objects can be migrated over the wire between different machines. CORBA’s promise was that through the use of mapping that remote calls could appear as local calls, and that distributed systems related exceptions could be mapped into local exceptions and handled by local exception handling mechanisms.</p>
-<p>However, as Vinoski points out in 2003, the evaluation of programming languages and abstractions based on transparency alone is flawed:</p>
-<blockquote>
-<p>“The goal is to merge middleware abstractions directly into the realm of the programming language, minimizing the impedance mismatch between the programming language world and the middleware world. For example, mappings make request invocations on distributed objects and services appear as normal programming-language function calls, and they map distributed system exceptions into native programming language exception-handling mechanisms.” <span class="citation">Vinoski (2003)</span></p>
-</blockquote>
 <h3 id="a-critique-of-the-remote-procedure-call-paradigm">“A Critique of the Remote Procedure Call Paradigm”</h3>
 <blockquote>
 <p>“We propose the following test for a general-purpose RPC system. Imagine that two programmers are working on a project. Programmer 1 is writing the main program. Programmer 2 is writing a collection of procedures to be called by the main program. The subject of RPC has never been mentioned and both programmers assume that all their code will be compiled and linked together into a single executable binary program and run on a free-standing computer, not connected to any networks.”</p>
 <p>“At the very last minute, after all the code has been thoroughly tested, debugged, and documented and both programmers have quit their jobs and left the country, the project management is forced by unexpected, external circumstances to run the program on a distributed system. The main program must run on one computer, and each procedure must run on a different computer. We also assume that all the stub procedures are produced mechanically by a stub generating program.”</p>
-<p>“It is our contention that a large number of things may now go wrong due to the fact that RPC tries to make remote procedure calls look exactly like local ones, but is unable to do it perfectly. Many of the problems can be solved by modifying the code is various ways, but then the transparency is lost. Once we admit that true transparency is impossible, and that programmers must know which calls are remote and which ones are local, we are faced with the question of whether a partially transparent mechanism is really better than one that was designed specifically for remote access and makes no attempt to make remote computations look local at all.“</p>
+<p>“It is our contention that a large number of things may now go wrong due to the fact that RPC tries to make remote procedure calls look exactly like local ones, but is unable to do it perfectly. Many of the problems can be solved by modifying the code is various ways, but then the transparency is lost. Once we admit that true transparency is impossible, and that programmers must know which calls are remote and which ones are local, we are faced with the question of whether a partially transparent mechanism is really better than one that was designed specifically for remote access and makes no attempt to make remote computations look local at all.”</p>
 </blockquote>
 <p>Tanenbaum and van Renesse directly attack the Remote Procedure Call paradigm stating that it is fundamentally wrong to treat local and remote calls the same. They state that the transparency that RPC tries to achieve is impossible and posit that a protocol that is designed specifically for remote access is better.</p>
 <p>The authors go on to describe an alternative paradigm: a “virtual circuit”. This alternative comes off sounding very similar to Distributed Erlang running with TCP: non-blocking send and receive operations across a sliding-window network protocol.</p>
@@ -97,7 +90,7 @@ Modern day RPC mechanisms.</p></li>
 <h4 id="the-two-army-problem">The Two Army Problem</h4>
 <p>How do we handle requesting irreplaceable data? (or, more generally have two servers come to agreement that some RPC was successfully executed and the response received.) Well, we can acknowledge the receipt of that information, but then we would also have to acknowledge the acknowledgements to be sure the acknowledgement was delivered, right? This topic, central to the agreement problem, has been discussed extensively in distributed systems literature <span class="citation">Halpern and Moses (1990)</span>.</p>
 <h4 id="parameters">Parameters</h4>
-<p>Tanenbaum and van Renesse discuss the problem of parameter passing and parameter marshalling. This issue becomes exacerbated with references in object systems such as CORBA, where specific distributed references have to be used to ensure they remain valid over time.</p>
+<p>Tanenbaum and van Renesse discuss the problem of parameter passing and parameter marshalling. This issue becomes exacerbated with references in object systems such as CORBA, where specific distributed references have to be used to ensure they remain accessible and valid over time.</p>
 <blockquote>
 <p>“However, if there are reference parameters or pointers, things are more complicated. While it is obviously possible to copy pointers into the message, when the server tries to use them, it will not work correctly because the object pointed to will not be present.”</p>
 <p>“Two possible solutions suggest themselves, each with major drawbacks. The first solution is to have the client stub not only put the pointer itself in the message, but also the thing pointed to. However, if the thing pointed to is the middle of a complex list structure containing pointers in both directions, sublists, etc., copying the entire structure into the message will be expensive. Furthermore, when it arrives, the structure will have to be reassembled at the same memory addresses that it had on the client side, because the server code will just perform indirection operations on the pointers as though it were working on local variables.”</p>
@@ -105,9 +98,16 @@ Modern day RPC mechanisms.</p></li>
 <p>“The other solution is just to pass the pointer itself. Every time the pointer is used, a message is sent back to the client to read or write the relevant word. The problem here is that we violate one of the basic rules: the compiler should not have to know that it is dealing with RPC. Normally the code produced for reading from a pointer is just to indirect from it. If remote pointers work differently from local pointers, the transparency of the RPC is lost.”</p>
 </blockquote>
 <h4 id="idempotence">Idempotence</h4>
-<p>Finally, the authors highlight the problem of providing exactly-once semantics across the network and the power of idempotence. Tanenbaum and van Renesse say it very conciesly.</p>
+<p>Finally, the authors highlight the problem of providing exactly-once semantics across the network and the power of idempotence. Tanenbaum and van Renesse say it very concisely.</p>
 <blockquote>
 <p>“Suppose a client does a nonidempotent RPC and the server crashes one machine instruction after finishing the operation, but before the server stub has had a chance to reply. The client stub times out and sends the request again. If the server has rebooted by then, there is a chance that the operation will be performed two or more times and thus fail.”</p>
+</blockquote>
+<h3 id="corba">CORBA</h3>
+<p>The Common Object Request Broker Architecture (CORBA) is an abstraction for object-oriented languages, popularized by C++, that allows you to communicate between different languages and different address spaces running on different machines. CORBA relied on the use of an Interface Definition Language (IDL) for specifying the interfaces of remote classes of objects; this IDL was used to generate stubs of what the remote systems object interfaces appeared as on the local machine. These IDL’s would be used to generate mappings between the abstract interfaces provided by the IDL’s and the actual implementations in languages such as C++ and Java.</p>
+<p>CORBA attempted to provide several benefits to the application developer: language independence, OS-independence, architecture-independence, static typing through a mapping of abstract types in the IDL to machine and language specific implementations of those types, and object transfer, where objects can be migrated over the wire between different machines. CORBA’s promise was that through the use of mapping that remote calls could appear as local calls, and that distributed systems related exceptions could be mapped into local exceptions and handled by local exception handling mechanisms.</p>
+<p>However, as Vinoski points out in 2003, the evaluation of programming languages and abstractions based on transparency alone is flawed:</p>
+<blockquote>
+<p>“The goal is to merge middleware abstractions directly into the realm of the programming language, minimizing the impedance mismatch between the programming language world and the middleware world. For example, mappings make request invocations on distributed objects and services appear as normal programming-language function calls, and they map distributed system exceptions into native programming language exception-handling mechanisms.” <span class="citation">Vinoski (2003)</span></p>
 </blockquote>
 <h3 id="a-note-on-distributed-computing">“A Note On Distributed Computing”</h3>
 <blockquote>
@@ -157,7 +157,7 @@ Modern day RPC mechanisms.</p></li>
 </blockquote>
 <p>The paper provides two examples of where this paradigm is problematic, but we will highlight one case, that builds upon RPC.</p>
 <h3 id="network-file-system">Network File System</h3>
-<p>Sun Microsystem’s <strong>Network File System (NFS)</strong>, built upon RPC, is one of the first distributed file systems to gain popularity. Network File System adhered to the existing filesystem API, but introduced an entire new class of failures resulting from network partitions, partial failure, and high latency. Network File System is a stateless protocol implemented in UDP; the decision to implement it this way is motivated by the perceived ease in debugging protocols that do not carry state.</p>
+<p>Sun Microsystem’s <strong>Network File System (NFS)</strong>, built upon RPC, is one of the first distributed file systems to gain popularity. Network File System adhered to the existing filesystem API, but introduced an entire new class of failures resulting from network partitions, partial failure, and high latency. Network File System is a stateless protocol implemented in UDP; the decision to implement it this way is motivated by crash recovery avoidance and protocol simplification <span class="citation">Sandberg et al. (1988)</span>.</p>
 <p>Network File System operated in two modes: soft mounting and hard mounting. Soft mounting introduced a series of new error codes related to the additional ways file operations could fail: these error codes were not known by existing UNIX applications and led to smaller adoption of this approach. Hard mounting introduced the opposite behavior for failures related to the network: <strong>operations would block until they could be completed successfully</strong>.</p>
 <p><em>It’s just a mapping problem, right?</em> <span class="citation">Vinoski (2003)</span></p>
 <h3 id="convenience-over-correctness">“Convenience Over Correctness”</h3>
@@ -220,6 +220,9 @@ Modern day RPC mechanisms.</p></li>
 <div id="ref-miller2014spores">
 <p>Miller, Heather, Philipp Haller, and Martin Odersky. 2014. “Spores: A Type-Based Foundation for Closures in the Age of Concurrency and Distribution.” In <em>ECOOP 2014–Object-Oriented Programming</em>, 308–33. Springer.</p>
 </div>
+<div id="ref-Sandberg:1988:DIS:59309.59338">
+<p>Sandberg, R., D. Golgberg, S. Kleiman, D. Walsh, and B. Lyon. 1988. “Innovations in Internetworking.” In, edited by C. Partridge, 379–90. Norwood, MA, USA: Artech House, Inc. <a href="http://dl.acm.org/citation.cfm?id=59309.59338" class="uri">http://dl.acm.org/citation.cfm?id=59309.59338</a>.</p>
+</div>
 <div id="ref-svensson2007more">
 <p>Svensson, Hans, and Lars-Ake Fredlund. 2007a. “A More Accurate Semantics for Distributed Erlang.” In <em>Erlang Workshop</em>, 43–54. Citeseer.</p>
 </div>
@@ -244,7 +247,7 @@ Modern day RPC mechanisms.</p></li>
 <ol>
 <li id="fn1"><p>Fun fact: BBN’s Internet division would later become Genuity and then Level3 out of bankruptcy and has autonomous system number 1 (ASN 1).<a href="#fnref1">↩</a></p></li>
 <li id="fn2"><p>Some systems that attempt to address this include Liskov’s promises <span class="citation">Liskov and Shrira (1988)</span> and Lee’s <span class="citation">Lee et al. (2015)</span> work on a reusable framework for linearizability.<a href="#fnref2">↩</a></p></li>
-<li id="fn3"><p>Our section on promises talks about this problem in depth <span class="citation">Liskov (1988)</span>.<a href="#fnref3">↩</a></p></li>
+<li id="fn3"><p>Our section on promises talks about this problem in depth <span class="citation">Liskov and Shrira (1988)</span>.<a href="#fnref3">↩</a></p></li>
 <li id="fn4"><p>For instance, if one was to build an object model on top of REST.<a href="#fnref4">↩</a></p></li>
 <li id="fn5"><p>Our related post on promises and futures challenges whether that abstraction is right either.<a href="#fnref5">↩</a></p></li>
 </ol>
