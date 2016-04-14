@@ -224,7 +224,7 @@ The paper provides two examples of where this paradigm is problematic, but we wi
 
 \subsubsection{Network File System}
 
-Sun Microsystem's \textbf{Network File System (NFS)}, built upon RPC, is one of the first distributed file systems to gain popularity.  Network File System adhered to the existing filesystem API, but introduced an entire new class of failures resulting from network partitions, partial failure, and high latency.  Network File System is a stateless protocol implemented in UDP; the decision to implement it this way is motivated by the perceived ease in debugging protocols that do not carry state.
+Sun Microsystem's \textbf{Network File System (NFS)}, built upon RPC, is one of the first distributed file systems to gain popularity.  Network File System adhered to the existing filesystem API, but introduced an entire new class of failures resulting from network partitions, partial failure, and high latency.  Network File System is a stateless protocol implemented in UDP; the decision to implement it this way is motivated by crash recovery avoidance and protocol simplification~\cite{Sandberg:1988:DIS:59309.59338}.
 
 Network File System operated in two modes: soft mounting and hard mounting.  Soft mounting introduced a series of new error codes related to the additional ways file operations could fail: these error codes were not known by existing UNIX applications and led to smaller adoption of this approach.  Hard mounting introduced the opposite behavior for failures related to the network: \textbf{operations would block until they could be completed successfully}.  
 
