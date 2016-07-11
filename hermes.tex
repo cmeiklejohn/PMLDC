@@ -2,6 +2,7 @@
 
 \begin{itemize}
 	\item \textit{Implementing Location Independent Invocation}, Black, Andrew P and Artsy, Yeshayahu, IEEE Transactions on Parallel and Distributed Systems, 1990~\cite{black1990implementing}.
+	\item \textit{Customizable and extensible deployment for mobile/cloud applications}, Zhang, Irene and Szekeres, Adriana and Van Aken, Dana and Ackerman, Isaac and Gribble, Steven D and Krishnamurthy, Arvind and Levy, Henry M, 2014~\cite{zhang2014customizable}.
 \end{itemize}
 
 \subsection{Commentary}
@@ -29,5 +30,7 @@ Emerald was more advanced in several ways.  Emerald's type system allowed for th
 While the system could tolerate some notion of failures while following forwarding addresses, by resorting to usage of the information located at the \textit{storesite}, the system had no way to prevent issues with partitions: where an invocation may fail because the object is inaccessible.  However, given the relative independence of objects in the system, this would only affect objects (or users) located on the partitioned machine.
 
 The design of Hermes was completed in a year and a half, written in Modula-2+, and was demonstrated functional in the laboratory with a LAN composed of a small number of nodes.  According to one of the authors of the paper, the system never was turned into a product, mainly because Digital did not have a team at the time responsible for turning advanced research projects into actual distributed systems products\footnote{Andrew P. Black, personal communication.}.
+
+The Sapphire~\cite{zhang2014customizable} system presented at OSDI '14 bears a similar resemblance to the Hermes system and its Emerald roots.  While Sapphire focuses on the separation of application logic from deployment logic through the use of interfaces and interface inheritance in object-oriented programming languages, Sapphire uses many of the techniques presented in both Emerald and Hermes: transparent relocation based on annotations or for load balancing; location independent method invocation through the use of forwarding pointers, and fallback to a persistent data store to find the canonical location of a particular object.
 
 Today, idempotence~\cite{Helland:2012:IMC:2181796.2187821} has been a topic of study in distributed systems, as it assists in designing deterministic computations that must happen on unreliable, asynchronous networks; a place where it is impossible to reliably detect failures~\cite{fischer1985impossibility}.  Shapiro \textit{et al.}~\cite{shapiro2011comprehensive} propose the use of data structures that are associative, commutative, and idempotent as the basis for shared state in distributed databases.  Meiklejohn and Van Roy~\cite{meiklejohn2015lasp} propose similar for large-scale distributed computations; whereas Conway \textit{et al.}~\cite{conway2012logic} propose similar for protocol development.  Lee \textit{et al.}~ propose a system called RIFL for ensuring exactly-once semantics for remote procedure calls by uniquely identifying each call and fault-tolerant storage of the results~\cite{lee2015implementing}.
