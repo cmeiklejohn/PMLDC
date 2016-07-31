@@ -3,6 +3,9 @@
 <li><p><em>High Level Programming for Distributed Computing</em>, Feldman, Jerome A, CACM 1979 <span class="citation">(Feldman 1979)</span>.</p></li>
 </ul>
 <h2 id="commentary">Commentary</h2>
+<blockquote>
+<p>“A significant conclusion was that parallelism and data sharing are inherently difficult to combine effectively.”</p>
+</blockquote>
 <p>The Programming Language in the Sky (PLITS) project was an effort by the University of Rochester Computer Science department started in 1974 to take a serious look at how to make programming languages more declarative, and to see what benefits could be gained from using state-of-the-art compiler technology. This paper, specifically focuses on the problem of addressing the need for programming language constructs for distributed computing, that normally do not arise in conventional programming<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>.</p>
 <p>At a high level, PASCAL-PLITS views distributed computing as a group of computers communicating over low bandwidth, unreliable communication paths, applications would consist of communication between modules via an asynchronous message protocol instead of through the use of subroutines to avoid having to wait for a response to a request. Modules only communicate through message passing, and each message is composed of a set of name-value pairs which are called slots: names are uninterpreted string and values are an element of some primitive type (for instance, integers.)</p>
 <p>To avoid discussion of many of the PASCAL specific details outlined in the formal specification section of the paper, the intuition on how message passing between two modules operates is rather straightforward:</p>
@@ -34,7 +37,7 @@
 <p>Identification of where a module are located is done through the module name, an incarnation number, site number and local module number: this means that the identifier of a process can locate where its running on the network alone, without the need for a global registry. However, given this is done on a module instance basis, modules only ever live on the same machine. To get around this, the authors suggest using equivalent modules across machines and having the caller make the decision where to send the message. As the authors state it quite succinctly “contrary to current fantasies about distributed computing”.</p>
 <h2 id="impact-and-implementations">Impact and Implementations</h2>
 <p>So, what’s the contribution of this paper?</p>
-<p>Well, as the authors describe it, it’s the “module-message” paradigm: something that you’ve probably seen before and the reason this paper has sounded so familiar, <strong>Erlang</strong>.</p>
+<p>Well, as the authors describe it, it’s the “module-message” paradigm: something that you’ve probably seen before and the reason this paper has sounded so familiar, <strong>Erlang</strong>, or more specifically <strong>Distributed Erlang</strong>.</p>
 <p>PLITS, only briefly mentioned in Joe Armstrong’s thesis, bears a striking resemblance to Erlang and brings some of the features that are used on a daily basis by Erlang developers. We quickly summarize those features now.</p>
 <ul>
 <li><p>Selective receive through the use of a transaction identifier has a strong resemblance to Erlang’s ability to generate a globally unique reference and use it as criteria to select from the process mailbox. This supports the forwarding behavior of processes that serve mainly for the routing of a request.</p></li>
@@ -42,6 +45,7 @@
 <li><p>The idea of encapsulation and locking or queueing messages for exclusion is similar to how processes control access to resources using the “generic abstractions” provided by Erlang: specifically, the “generic server” or “gen_server”. The generic server and generic finite state machine are both to control access to some state and has the ability to either select specific messages for processing related to a message identifier, or interleave requests if possible based on selective receive and asynchronous messaging.</p></li>
 <li><p>The design of both the PLITS kernel, as a process scheduler responsible for waking and suspending processes waiting on messages, as well as the Host Control Program work very similar to the implementation of Distributed Erlang: processes running on remote machines are uniquely identified by a process identifier that encodes the machine name and messages are transparently delivered to them under what aims to achieve reliable transmission, but sometimes falls short.</p></li>
 </ul>
+<p>We should be clear, however, that PLITS is <strong>not</strong> an actor-based language such as Erlang. While PLITS shares many of the same design patterns and abstractions, the language is fundamentally a module-message system: modules are identified by name, which includes a location and incarnation number and are the target of messages, not processes.</p>
 <div id="refs" class="references">
 <div id="ref-feldman1979high">
 <p>Feldman, Jerome A. 1979. “High Level Programming for Distributed Computing.” <em>Communications of the ACM</em> 22 (6). ACM: 353–68.</p>
@@ -50,8 +54,8 @@
 <div class="footnotes">
 <hr />
 <ol>
-<li id="fn1"><p>It is easy to argue today that conventional programming, <strong>is</strong> distributed computing, but I digress<a href="#fnref1">↩</a></p></li>
+<li id="fn1"><p>It is easy to argue today that conventional programming, <strong>is</strong> distributed computing, but I digress.<a href="#fnref1">↩</a></p></li>
 <li id="fn2"><p>The dilligent reader will notice that the PASCAL-PLITS system argues that they provide stronger guarantees than “very strong typing” through this slot system, but it’s unclear how slot compatibility and forwarding can be verified without either dataflow analysis or type checking at compile time: the slot system is supposed to be more expressive because it describes application level behavior.<a href="#fnref2">↩</a></p></li>
-<li id="fn3"><p>Not discussed in the literature is how it’s required that the HCP guarantees reliable transmission and handles flow control and error handling<a href="#fnref3">↩</a></p></li>
+<li id="fn3"><p>Not discussed in the literature is how it’s required that the HCP guarantees reliable transmission and handles flow control and error handling.<a href="#fnref3">↩</a></p></li>
 </ol>
 </div>
