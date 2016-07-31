@@ -6,7 +6,7 @@
 
 \subsection{Commentary}
 
-The Programming Language in the Sky (PLITS) project was an effort by the University of Rochester Computer Science department started in 1974 to take a serious look at how to make programming languages more declarative, and to see what benefits could be gained from using state-of-the-art compiler technology.  This paper, specifically focuses on the problem of addressing the need for programming language constructs for distributed computing, that normally do not arise in conventional programming\footnote{It is easy to argue today that conventional programming, \textbf{is} distributed computing, but I digress}.
+The Programming Language in the Sky (PLITS) project was an effort by the University of Rochester Computer Science department started in 1974 to take a serious look at how to make programming languages more declarative, and to see what benefits could be gained from using state-of-the-art compiler technology.  This paper, specifically focuses on the problem of addressing the need for programming language constructs for distributed computing, that normally do not arise in conventional programming\footnote{It is easy to argue today that conventional programming, \textbf{is} distributed computing, but I digress.}.
 
 At a high level, PASCAL-PLITS views distributed computing as a group of computers communicating over low bandwidth, unreliable communication paths, applications would consist of communication between modules via an asynchronous message protocol instead of through the use of subroutines to avoid having to wait for a response to a request.  Modules only communicate through message passing, and each message is composed of a set of name-value pairs which are called slots: names are uninterpreted string and values are an element of some primitive type (for instance, integers.)
 
@@ -41,7 +41,7 @@ Perhaps the most interesting part of the PLITS system is the distribution system
 \item Machines are made up of multiple sites, each with a kernel that keeps track of scheduling and which modules are waiting to receive messages: within a site, messages must have the same format and same primitive data representation.
 \item Kernels are responsible for distribution of messages within a site, forwarding messages between sites and resource allocation.
 \item Co-located with a kernel is a Host Control Program (HCP) that is responsible for forwarding within sites on the same machine, and forwarding messages between machines.
-\item Finally, the HCP is divided into two components: a distributed job manager and communication manager: one for job-lifecycle related operations and one for managing communication between machines\footnote{Not discussed in the literature is how it's required that the HCP guarantees reliable transmission and handles flow control and error handling}.
+\item Finally, the HCP is divided into two components: a distributed job manager and communication manager: one for job-lifecycle related operations and one for managing communication between machines\footnote{Not discussed in the literature is how it's required that the HCP guarantees reliable transmission and handles flow control and error handling.}.
 \end{itemize}
 
 Messages to the recipients that are overloaded are buffered by the sender: this procedure is done on the sender side through process suspension.  If nodes are located together at the same site, the kernel is responsible for this process, if not, the distributed communication manager is responsible for control flow management.
