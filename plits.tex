@@ -1,0 +1,64 @@
+\subsection{Relevant Reading}
+
+\begin{itemize}
+	\item \textit{High Level Programming for Distributed Computing}, Feldman, Jerome A, CACM 1979~\cite{feldman1979high}.
+\end{itemize}
+
+\subsection{Commentary}
+
+The Programming Language in the Sky (PLITS) project was an effort by the University of Rochester Computer Science department started in 1974 to take a serious look at how to make programming languages more declarative, and to see what benefits could be gained from using state-of-the-art compiler technology.  This paper, specifically focuses on the problem of addressing the need for programming language constructs for distributed computing, that normally do not arise in conventional programming\footnote{It is easy to argue today that conventional programming, \textbf{is} distributed computing, but I digress}.
+
+At a high level, PASCAL-PLITS views distributed computing as a group of computers communicating over low bandwidth, unreliable communication paths, applications would consist of communication between modules via an asynchronous message protocol instead of through the use of subroutines to avoid having to wait for a response to a request.  Modules only communicate through message passing, and each message is composed of a set of name-value pairs which are called slots: names are uninterpreted string and values are an element of some primitive type (for instance, integers.)
+
+To avoid discussion of many of the PASCAL specific details outlined in the formal specification section of the paper, the intuition on how message passing between two modules operates is rather straightforward:
+\begin{itemize}
+\item Messages can be sent between two modules where slots are compatible: for instance, both a server and client must define the types of messages they can receive and send, and they must specify the slots of the message they are going to read.  It's perfectly fine in this system to define a message that underspecifies the message slots -- readers can only access what they know about through their local specification.
+\item Messages are sent to recipients by specifying the recipient's module identifier and can be selectively received at the recipient by sender's module identifier.
+\item Messages in PASCAL-PLITS arrive in FIFO order between modules and waiting on a message that never arrives after a particular time interval will throw an application-level exception.
+\item Messages support a grouping behavior that allow for fixed size repetitions of values by type, nested one level deep, as values in slots.
+\end{itemize}
+
+An interesting idea that the paper presents is the idea of forwarding the message to another module for handling processing.  For instance, a server might need to accept a message and pass that message to another client to handle specific processing of that request.  In that case, the path from original sender, to server, to client handling the request must be retraced when the request is complete and the response is being returned to the original caller.  PASCAL-PLITS offers an alternative method: a unique transaction identifier is transmitted with the original message, so the client handling the request can send it directly back to the original sender, by passing the coordinating server module.  In PASCAL-PLITS, this is referred to as a transaction key, and receive messages can specifically request they want to selectively receive messages \textbf{about} a key, instead of \textbf{from} a specific recipient; because of this proxy-like behavior, modules need to be able to read only particular slots of the message, and ignore, but forward, the remainder\footnote{The dilligent reader will notice that the PASCAL-PLITS system argues that they provide stronger guarantees than ``very strong typing'' through this slot system, but it's unclear how slot compatibility and forwarding can be verified without either dataflow analysis or type checking at compile time: the slot system is supposed to be more expressive because it describes application level behavior.}.
+
+The authors argue for message passing over subroutines:
+
+\begin{quote}
+``The message paradigm has several advantages over subroutine calls. If the modules were in different languages, the subroutine call mechanisms would have to be made compatible. Any sophisticated lockout procedure would require the internal coding of queues equivalent to what the message switcher provides. In the subroutine discipline, a module which tries to execute a locked subroutine is unable to proceed with other computation. The total picture on the relative value of messages and calls is much more complex...''	
+\end{quote}
+
+The authors also argue for the encapsulation provided by message passing as the only interface to data:
+
+\begin{quote}
+``There are other interesting features that arise when messages are combined with the idea of modules. The most obvious feature of PLITS programming is the high degree of locality and protection it provides. Each PLITS module is totally self-contained and communicates solely through messages. This means that no local variables can even be examined from the outside, no procedures invoked, etc. A module can be asked to return or update a value, execute a function, etc. It now becomes quite natural to screen requests for validity (much more than type checking), to guard against conflicting demands on a data structure, etc. This does not solve all the problems attacked by structured programming strictures, but does make it clear what has to be done and where.``
+\end{quote}
+
+The authors use this encapsulation to solve the exclusion problem: if module B is storing data that A wants to compare and swap, B simply ignores messages that do not contain the transaction key generated by A until the swap is complete (or, does not handle messages related to the keys that are beings swapped until the operation is complete.)  However, this ultimately brings additional complexities, as now the module itself must deal with the queue management of messages that are waiting to be processed while resources are locked.
+
+Perhaps the most interesting part of the PLITS system is the distribution system for running distributed jobs.  Distribution is tackled through a layered approach: 
+
+\begin{itemize}
+\item Networks are made up of a set of machines.
+\item Machines are made up of multiple sites, each with a kernel that keeps track of scheduling and which modules are waiting to receive messages: within a site, messages must have the same format and same primitive data representation.
+\item Kernels are responsible for distribution of messages within a site, forwarding messages between sites and resource allocation.
+\item Co-located with a kernel is a Host Control Program (HCP) that is responsible for forwarding within sites on the same machine, and forwarding messages between machines.
+\item Finally, the HCP is divided into two components: a distributed job manager and communication manager: one for job-lifecycle related operations and one for managing communication between machines\footnote{Not discussed in the literature is how it's required that the HCP guarantees reliable transmission and handles flow control and error handling}.
+\end{itemize}
+
+Messages to the recipients that are overloaded are buffered by the sender: this procedure is done on the sender side through process suspension.  If nodes are located together at the same site, the kernel is responsible for this process, if not, the distributed communication manager is responsible for control flow management.
+
+Identification of where a module are located is done through the module name, an incarnation number, site number and local module number: this means that the identifier of a process can locate where its running on the network alone, without the need for a global registry.  However, given this is done on a module instance basis, modules only ever live on the same machine.  To get around this, the authors suggest using equivalent modules across machines and having the caller make the decision where to send the message.  As the authors state it quite succinctly ``contrary to current fantasies about distributed computing''.
+
+\subsection{Impact and Implementations}
+So, what's the contribution of this paper?
+
+Well, as the authors describe it, it's the ``module-message'' paradigm: something that you've probably seen before and the reason this paper has sounded so familiar, \textbf{Erlang}.  
+
+%% TODO: Add citation.
+PLITS, only briefly mentioned in Joe Armstrong's thesis, bears a striking resemblance to Erlang and brings some of the features that are used on a daily basis by Erlang developers.  We quickly summarize those features now.
+
+\begin{itemize}
+\item Selective receive through the use of a transaction identifier has a strong resemblance to Erlang's ability to generate a globally unique reference and use it as criteria to select from the process mailbox.  This supports the forwarding behavior of processes that serve mainly for the routing of a request.
+\item Repetition in slot values, where each value is tagged in the initial position by type bear a strong resemblance of how tagged tuples are used in records to specify a typed value purely as tuples.  
+\item The idea of encapsulation and locking or queueing messages for exclusion is similar to how processes control access to resources using the ``generic abstractions'' provided by Erlang: specifically, the ``generic server'' or ``gen\_server''.  The generic server and generic finite state machine are both to control access to some state and has the ability to either select specific messages for processing related to a message identifier, or interleave requests if possible based on selective receive and asynchronous messaging.
+\item The design of both the PLITS kernel, as a process scheduler responsible for waking and suspending processes waiting on messages, as well as the Host Control Program work very similar to the implementation of Distributed Erlang: processes running on remote machines are uniquely identified by a process identifier that encodes the machine name and messages are transparently delivered to them under what aims to achieve reliable transmission, but sometimes falls short.
+\end{itemize}
