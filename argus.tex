@@ -1,0 +1,81 @@
+\subsection{Relevant Reading}
+
+\begin{itemize}
+	\item \textit{Abstraction Mechanisms in CLU}, Liskov, Barbara and Snyder, Alan and Atkinson, Russell and Schaffert, Craig, CACM 1977~\cite{liskov1977abstraction}.
+	\item \textit{Guardians and Actions: Linguistic Support for Robust, Distributed Programs}, Liskov, Barbara and Scheifler, Robert, TOPLAS 1982~\cite{liskov1983guardians}.
+	\item \textit{Orphan Detection in the Argus System}, Walker, Edward Franklin, DTIC 1984~\cite{walker1984orphan}.
+	\item \textit{Implementation of Argus}, Liskov, Barbara and Curtis, Dorothy and Johnson, Paul and Scheifer, Robert, SIGOPS 1987~\cite{liskov1987implementation}.
+	\item \textit{Distributed Programming in Argus}, Liskov, Barbara  CACM 1988~\cite{liskov1988distributed}.	
+\end{itemize}
+
+\subsection{Commentary}
+
+\begin{quote}
+``However, regardless of advances in hardware, we believe atomic actions are necessary and are a natural model for a large class of applications.  If the language does not provide actions, the user will be compelled to implement them, perhaps unwittingly reimplementing with each new application, and may implement them incorrectly.''	
+\end{quote}
+
+\subsubsection{Overview}
+
+The focus of these papers is the ARGUS system (and it's roots with the programming language CLU), developed in the Laboratory for Computer Science at the Massachusetts Institute of Technology.  ARGUS was designed to solve the problem of programming language support for the construction and maintenance of distributed programs constructed from modules executing at, and communicating from, geographically distinct nodes.  ARGUS was designed with the following goals in mind:
+
+\begin{itemize}
+\item \textbf{Service:} Programs should have localized failures, and be geographically distributed with replicated data for both fault-tolerance and availability.
+\item \textbf{Reconfiguration:} Software should be able to be reconfigured while the system is running: this allows for the addition of additional capacity to increase processing power, decrease response times, or increase the availability of data.
+\item \textbf{Autonomy:} Nodes in the system may be owned by individuals or organizations that need to control what data is replicated at the node for political or sociological reasons.
+\item \textbf{Distribution:} Programs should be able to control explicit placement of data to ensure responsiveness and cost-effectiveness of hardware in the system.
+\item \textbf{Concurrency:} Distribution should be able to exploit the available concurrency in the system.
+\item \textbf{Consistency:} Consistency must be maintained, specifically for invariant preservation: for instance, conservation of funds during a transfer between two accounts.
+\end{itemize}
+
+Of all of the aforemtioned concerns, the authors posit that the most difficult of these to provide is \textbf{consistency}: consistency becomes much more difficult to preserve in a system where coordination is minimized to avoid interference and mask failures of the network.  Therefore, the authors present a technique for integrating \textbf{atomicity} as fundamental concept in a programming language.
+
+\subsubsection{Atomicity}
+
+Since data resiliency only guarantees consistency under a quiescent environment, it is necessary to make some operations in the system \textbf{atomic}.  When the authors state \textbf{atomic}, they mean two things:
+
+\begin{itemize}
+\item \textbf{Indivisibility:} the execution of an activity in the system never appears to overlap with another activity in the system.
+\item \textbf{Recoverability:} the overall effect of an activity is all or nothing: in the event of a failure, the activity must be completed after recovery or all objects must be restored to their initial state.	
+\end{itemize}
+
+ARGUS defines activities that are atomic as \textbf{actions}: actions must either be committed or aborted.  If an action happens to abort, the effects appear as if they had never happened; if actions commit, all modified objects in the system take on their new state.  To achieve this behavior with shared objects in a concurrent system, the system must guarantee serializability: mainly, actions must appear to happen in some sequential order in the system, but accesses to share objects have to versioned and synchronized to allow for changes to be reverted when actions are aborted.
+
+ARGUS first introduces atomic objects through \textbf{atomic abstract data types}: sets of objects and primitive operations for interacting with those objects.  These objects operate similar to normal data types extended with operations that ensure indivisibility and recoverability.  Access to objects within an atomic abstract data type are done through locking: read/write locks with versioning is used to facilitate concurrency access in the system.  Write operations operate against a copy of the current version, and when the action completes, the new version of the object is written, replacing the old.
+
+The authors argus for indivisibility as a desired property, even if it reduces the amount of potential concurrency in the system:
+
+\begin{quote}
+``It has been argued that indivisibility is too strong a property for certain applications because it limits the amount of potential concurrency.  We believe that indivisibility is the desired property for most application, \textit{if} it is required only at the appropriate levels of abstraction.  ARGUS provides a mechanism for \textit{user-defined} atomic data types.''	
+\end{quote}
+
+Nested actions, or subactions, can be used to further divide actions and introduce concurrency within an action: each action can contain any number of subactions that can be either executed sequentially or concurrently.  Subactions can commit or abort independently and this behavior has no impact on the parent action.  However, an abort of a parent can force the abort of a subaction.
+
+Nested actions are useful for composition of activities: for instance, many smaller subactions can be combined into a single higher-level action and run concurrently within that action.  Each nested action has a relationship with its parent where write locks can be inherited from the parent and can be modeled as a stack: each transaction shares locks with it's ancestors and discarded by a subaction once it completes.
+
+The authors argue for Remote Procedure Call and state that nested actions can be used for masking the communication failures inherent in the paradigm:
+
+\begin{quote}
+``In fact, we believe the form of communication that is needed is \textit{remote procedure call,} with \textit{at-most-once} semantics, namely, that (effectively) either the message is delivered and acts on exactly once, with exactly one reply received, or the message is never delivered and the sender is so informed.''	
+\end{quote}
+
+The authors believe that low-level issues from the system should be shielded from the user, such as packet retransmission, but do believe that the system should make a reasonable attempt of delivery for messages.  However, the users believe that the notion that long delays are possible and that ultimate failure is possible, should be made present to the user.  The authors propose that the subaction should be used for this: individual subactions can abort without causing the entire parent action to abort: in the case where these subactions do abort, the user should be able to take action, such as try an alternative replica to service the request.  
+
+In this model, some top-level actions can not be aborted.  Consider the case of an airline reservation system: the clerk can initiate operations for making a reservation and subactions can take action and try multiple replicas if, for instance, the primary can not be contacted.  However, an external event performed by a top-level action, such as printing a check, can not be undone and needs to have a compensating action for dealing with this behavior.  To alleviate this problem, the authors suggest breaking these into two separate top-level actions, where they are sequenced to ensure the completion of one before the execution of the subsequent operation.
+
+Finally, the authors acknowledge that even in this model timeouts are necessary to resolve issues that might arise from contention or deadlocks between atomic resources.  
+
+\subsubsection{Semantics}
+
+We won't provide the full semantics of how the ARGUS language works, but provide a brief write up that should give you the general idea of how the system works.
+
+In ARGUS, distributed programs are composed of a group of \textbf{guardians}.  Guardians encapsulate and control access to one or more resources and makes them available through operations called \textbf{handlers}, which are called by other guardians.  Guardians contain both data and processes: process execute handlers and are spawned for each call to a handler by another guardian. Processes have access to objects that make up the state of the guardian and this is how access to objects is controlled.
+
+Guardians contain both stable and volatile objects: volatile objects are lost when nodes running a guardian fail.  When a guardian fails, the language support system is responsible for recreating the guardian with the objects that were persisted to stable storage.  Stable state is versioned when modifications are performed, and volatile objects live on the heap.  Guardians are created dynamically and the node where the guardian runs is specified by the programmer: guardians represent a logical node of the system where communication is performed by handlers, an abstraction of state and the physical network.
+
+Processes in guardians execute concurrently and the language controls access to atomic objects using the locking mechanisms described above: in addition, a coroutining facility allows subactions to be further divided into concurrent executions, yielding more concurrency from the system.
+
+ARGUS provides static type checking at compile time and loading of new guardians and handlers while the system is running: to ensure this happens safely, types must be known by the system before loading a handler that uses these types.  Guardians and handlers are first class and can be used as both arguments and return values from handler invocations.
+
+As the authors highlight, the major drawbacks of the system are in security and scheduling.  ARGUS provides no mechanism for securing  guardians from particular guardians or preventing nodes from launching certain types of guardians.  ARGUS also has no mechanism for priority servicing of calls, backpressure, or load-shedding, leading the system susceptible to scheduling problems when overloaded.
+
+\subsection{Impact and Implementations}
