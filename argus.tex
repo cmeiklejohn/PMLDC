@@ -29,7 +29,7 @@ The focus of these papers is the ARGUS system (and it's roots with the programmi
 
 Of all of the aforemtioned concerns, the authors posit that the most difficult of these to provide is \textbf{consistency}: consistency becomes much more difficult to preserve in a system where coordination is minimized to avoid interference and mask failures of the network.  Therefore, the authors present a technique for integrating \textbf{atomicity} as fundamental concept in a programming language.
 
-\subsubsection{Atomicity}
+\subsubsection{Atomicity and Actions}
 
 Since data resiliency only guarantees consistency under a quiescent environment, it is necessary to make some operations in the system \textbf{atomic}.  When the authors state \textbf{atomic}, they mean two things:
 
@@ -38,19 +38,33 @@ Since data resiliency only guarantees consistency under a quiescent environment,
 \item \textbf{Recoverability:} the overall effect of an activity is all or nothing: in the event of a failure, the activity must be completed after recovery or all objects must be restored to their initial state.	
 \end{itemize}
 
-ARGUS defines activities that are atomic as \textbf{actions}: actions must either be committed or aborted.  If an action happens to abort, the effects appear as if they had never happened; if actions commit, all modified objects in the system take on their new state.  To achieve this behavior with shared objects in a concurrent system, the system must guarantee serializability: mainly, actions must appear to happen in some sequential order in the system, but accesses to share objects have to versioned and synchronized to allow for changes to be reverted when actions are aborted.
+ARGUS introduces \textbf{actions}: atomic activities that need to either be committed or aborted and provide both the indivisibility and recoverability properties.  If an action happens to abort, it is as if the the effects had never happened; if an action happens to commit, all modified objects in the system take on their new state.  However, since ARGUS is a concurrent system, shared objects that will be manipulated by concurrent atomic actions must be done via synchronization, with read/and write locks. 
 
-ARGUS first introduces atomic objects through \textbf{atomic abstract data types}: sets of objects and primitive operations for interacting with those objects.  These objects operate similar to normal data types extended with operations that ensure indivisibility and recoverability.  Access to objects within an atomic abstract data type are done through locking: read/write locks with versioning is used to facilitate concurrency access in the system.  Write operations operate against a copy of the current version, and when the action completes, the new version of the object is written, replacing the old.
+To achieve this, ARGUS introduces a type of atomic object, or as they call it, \textbf{atomic abstract data types}: sets of objects and primitive operations for interacting with those objects.  These objects are similar to normal data types, but are extended with operations that ensure indivisibility and recoverability.  Access to objects within an atomic abstract data type are done through locking: read/write locks with versioning is used to facilitate concurrency access in the system.  Write operations operate against a copy of the current version, and when the action completes, the new version of the object is written, replacing the old.
 
-The authors argus for indivisibility as a desired property, even if it reduces the amount of potential concurrency in the system:
+\subsubsection{Nested Actions}
+
+
+The authors argue for indivisibility as a desired property, even if it reduces the amount of potential concurrency in the system:
 
 \begin{quote}
 ``It has been argued that indivisibility is too strong a property for certain applications because it limits the amount of potential concurrency.  We believe that indivisibility is the desired property for most application, \textit{if} it is required only at the appropriate levels of abstraction.  ARGUS provides a mechanism for \textit{user-defined} atomic data types.''	
 \end{quote}
 
-Nested actions, or subactions, can be used to further divide actions and introduce concurrency within an action: each action can contain any number of subactions that can be either executed sequentially or concurrently.  Subactions can commit or abort independently and this behavior has no impact on the parent action.  However, an abort of a parent can force the abort of a subaction.
+Nested actions, or subactions, can be used to further divide actions and introduce concurrency within an action: each action can contain any number of subactions that can be either executed sequentially or concurrently.  Subactions can commit or abort independently and this behavior has no impact on the parent action.  However, an abort of a parent will force the abort of all  subactions.
 
-Nested actions are useful for composition of activities: for instance, many smaller subactions can be combined into a single higher-level action and run concurrently within that action.  Each nested action has a relationship with its parent where write locks can be inherited from the parent and can be modeled as a stack: each transaction shares locks with it's ancestors and discarded by a subaction once it completes.
+Nested actions provide support for the composition of actions into a larger action where some of the nested actions can run in parallel or might fail and have to be compensated for.  For instance, if one subaction has to contact a remote guardian that may be unavailable, that subaction can abort and the operation retried against another remote guardian: the authors refer to this as ``several ways to accomplish a task.''
+
+Because nested actions may fail, interact with several guardians, and have ``checkpointing'' behavior as they either abort or succeed, each nested actions ancestor needs to track metadata during the execution:
+
+\begin{enumerate}
+\item Each subaction will inherit locks from its ancestor: read locks are directly inherited, but write locks can only be inherited if all read locks can also be inherited.
+\item Each subaction can abort or succeed: if the action aborts, the ancestor will restore the state, or ``checkpoint'', of the execution to before the operation was executed.	
+\item Each version created by a subaction needs to be propagated, to ensure that the effects of a previous write to a successful nested action are available to a subsequent subaction.
+\item Each top-level action will track what's referred to as a \textit{plist}, which is a list of all of the guardians contacted during the execution of the action to be used in the final two-phase commit protocol to commit the action and write to stable storage.
+\end{enumerate}
+
+\subsubsection{Remote Procedure Call and the Network}
 
 The authors argue for Remote Procedure Call and state that nested actions can be used for masking the communication failures inherent in the paradigm:
 
@@ -78,4 +92,16 @@ ARGUS provides static type checking at compile time and loading of new guardians
 
 As the authors highlight, the major drawbacks of the system are in security and scheduling.  ARGUS provides no mechanism for securing  guardians from particular guardians or preventing nodes from launching certain types of guardians.  ARGUS also has no mechanism for priority servicing of calls, backpressure, or load-shedding, leading the system susceptible to scheduling problems when overloaded.
 
+Finally, the authors acknowledge that \textbf{concurrent programming is hard}.  While ARGUS goes to great efforts to simplify the problem of maintaining consistency in a distributed application, as highlighted by the banking example, the ARGUS system made it all to easy to introduce deadlocks by having concurrent processes in a guardian, or concurrent actions, take out read/write locks in the wrong order.
+
 \subsection{Impact and Implementations}
+
+ARGUS was arguably the first system to provide a distributed programming paradigm where consistency was integrated in the language as a first class concept.  ARGUS built on top of CLU, and provided a series of abstractions directly assisting programmers in writing code that maintained consistency, as the authors felt this was the main challenge in distributed programming.
+
+ARGUS served as the platform where other ideas would blossom: both \textbf{Remote Procedure Call} was used as the primary abstraction for making remote calls, where subactions were used to mask omissions.  The optimizations that \textbf{Promises} provided to pipeline RPCs and ensure ordering of requests and responses also were originally developed in the ARGUS system.
+
+The idea of compensating transactions in ARGUS for top-level actions that can not be ``recovered'' also appeared later in the SAGA design~\cite{garcia1987sagas}.
+
+Finally, languages like Bloom~\cite{alvaro2011consistency}, while not providing abstractions for consistency, take an alternative approach by providing analysis tools for determining where consistency could be violated and cause program anomalies.  The authors propose to plug in a distributed consensus mechanism, such as Zookeeper, to ensure consistency while performing these changes.
+
+%% TODO: Maybe add Orleans actor stuff here?
