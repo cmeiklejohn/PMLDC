@@ -161,7 +161,7 @@ However, as Vinoski points out in 2003, the evaluation of programming languages 
 ``It is the thesis of this note that this unified view of objects is mistaken.''~\cite{kendall1994note}
 \end{quote}
 
-In this pinnacle Waldo paper, they argue that "it is perilous to ignore the differences" between local and distributed computing and that the unified view of objects is flawed.~\cite{kendall1994note}  They cite two independent groups of work, the systems of Emerald and Argus, and the modern equivalents of those systems, Microsoft's DCOM and OMG's CORBA: all systems that  extended the RPC mechanism to objects and method invocation.
+In this pinnacle Waldo paper, they argue that ``it is perilous to ignore the differences'' between local and distributed computing and that the unified view of objects is flawed.~\cite{kendall1994note}  They cite two independent groups of work, the systems of Emerald and Argus, and the modern equivalents of those systems, Microsoft's DCOM and OMG's CORBA: all systems that extended the RPC mechanism to objects and method invocation.
 
 We can summarize the ``promise'' of the unified view of objects, as Waldo does in the paper.
 
@@ -226,7 +226,7 @@ The paper provides two examples of where this paradigm is problematic, but we wi
 
 Sun Microsystem's \textbf{Network File System (NFS)}, built upon RPC, is one of the first distributed file systems to gain popularity.  Network File System adhered to the existing filesystem API, but introduced an entire new class of failures resulting from network partitions, partial failure, and high latency.  Network File System is a stateless protocol implemented in UDP; the decision to implement it this way is motivated by crash recovery avoidance and protocol simplification~\cite{Sandberg:1988:DIS:59309.59338}.
 
-Network File System operated in two modes: soft mounting and hard mounting.  Soft mounting introduced a series of new error codes related to the additional ways file operations could fail: these error codes were not known by existing UNIX applications and led to smaller adoption of this approach.  Hard mounting introduced the opposite behavior for failures related to the network: \textbf{operations would block until they could be completed successfully}.  
+Network File System operated in two modes: soft mounting and hard mounting.  Soft mounting introduced a set of new error codes related to the additional ways file operations could fail: these error codes were not known by existing UNIX applications and led to smaller adoption of this approach.  Hard mounting introduced the opposite behavior for failures related to the network: \textbf{operations would block until they could be completed successfully}.  
 
 \textit{It's just a mapping problem, right?}~\cite{vinoski2003s}
 
@@ -246,7 +246,7 @@ Vinoski highlights three very important points in ``Convenience Over Correctness
 
 \subsection{Impact and Implementations}
 
-Remote Procedure Call (RPC) has been around for a very long time and while many opponents of RPC have been extremely critical of it, it still remains one of the most widely used way of writing distributed applications.  There's an unprecedented amount of use of frameworks for RPC like Google's Protocol Buffers, and Apache's Thrift deployed and used in production applications every day.
+Remote Procedure Call (RPC) has been around for a very long time and while many opponents of RPC have been extremely critical of it, it still remains one of the most widely used way of writing distributed applications.  There's an unprecedented amount of use of frameworks for RPC such as Google's Protocol Buffers and Apache's Thrift used in production applications.
 
 Frameworks such as Google's gRPC for HTTP/2.0 and Twitter's Finagle continue to reduce the amount of complexity in building applications with them, attempting to bring RPC to an even wider audience.  For instance, Twitter's Finagle is protocol-independent and attempts to deal with the problems of distribution directly.  Finagle does this through the use of futures, which allow composition and explicit sequencing; Google's gRPC does similar.  These frameworks claim that since they do not attempt to hide the fact that the calls are remote, that it provides a better abstraction.  However, now we have returned to the aforementioned problem of soft mounting in NFS: explicitly handling the flow control from the array of possible network exceptions that could occur, though mitigated through the use of promises/futures~\footnote{Our related post on promises and futures challenges whether that abstraction is right either.}.
 
