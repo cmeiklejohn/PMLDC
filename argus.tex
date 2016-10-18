@@ -27,7 +27,7 @@ The focus of these papers is the ARGUS system (and it's roots with the programmi
 \item \textbf{Consistency:} Consistency must be maintained, specifically for invariant preservation: for instance, conservation of funds during a transfer between two accounts.
 \end{itemize}
 
-Of all of the aforemtioned concerns, the authors posit that the most difficult of these to provide is \textbf{consistency}: consistency becomes much more difficult to preserve in a system where coordination is minimized to avoid interference and mask failures of the network.  Therefore, the authors present a technique for integrating \textbf{atomicity} as fundamental concept in a programming language.
+Of all of the aforementioned concerns, the authors posit that the most difficult of these to provide is \textbf{consistency}: consistency becomes much more difficult to preserve in a system where coordination is minimized to avoid interference and m ask failures of the network.  Therefore, the authors present a technique for integrating \textbf{atomicity} as fundamental concept in a programming language.
 
 \subsubsection{Atomicity and Actions}
 
@@ -38,12 +38,11 @@ Since data resiliency only guarantees consistency under a quiescent environment,
 \item \textbf{Recoverability:} the overall effect of an activity is all or nothing: in the event of a failure, the activity must be completed after recovery or all objects must be restored to their initial state.	
 \end{itemize}
 
-ARGUS introduces \textbf{actions}: atomic activities that need to either be committed or aborted and provide both the indivisibility and recoverability properties.  If an action happens to abort, it is as if the the effects had never happened; if an action happens to commit, all modified objects in the system take on their new state.  However, since ARGUS is a concurrent system, shared objects that will be manipulated by concurrent atomic actions must be done via synchronization, with read/and write locks. 
+ARGUS introduces \textbf{actions}: atomic transactions that need to either be committed or aborted and provide both the indivisibility and recoverability properties.  If an action happens to abort, it is as if the the effects had never happened; if an action happens to commit, all modified objects in the system take on their new state.  However, since ARGUS is a concurrent system, shared objects that will be manipulated by concurrent atomic actions must be done via synchronization, with read/and write locks. 
 
 To achieve this, ARGUS introduces a type of atomic object, or as they call it, \textbf{atomic abstract data types}: sets of objects and primitive operations for interacting with those objects.  These objects are similar to normal data types, but are extended with operations that ensure indivisibility and recoverability.  Access to objects within an atomic abstract data type are done through locking: read/write locks with versioning is used to facilitate concurrency access in the system.  Write operations operate against a copy of the current version, and when the action completes, the new version of the object is written, replacing the old.
 
 \subsubsection{Nested Actions}
-
 
 The authors argue for indivisibility as a desired property, even if it reduces the amount of potential concurrency in the system:
 
@@ -103,5 +102,3 @@ ARGUS served as the platform where other ideas would blossom: both \textbf{Remot
 The idea of compensating transactions in ARGUS for top-level actions that can not be ``recovered'' also appeared later in the SAGA design~\cite{garcia1987sagas}.
 
 Finally, languages like Bloom~\cite{alvaro2011consistency}, while not providing abstractions for consistency, take an alternative approach by providing analysis tools for determining where consistency could be violated and cause program anomalies.  The authors propose to plug in a distributed consensus mechanism, such as Zookeeper, to ensure consistency while performing these changes.
-
-%% TODO: Maybe add Orleans actor stuff here?
