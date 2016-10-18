@@ -38,7 +38,7 @@
 <h2 id="impact-and-implementations">Impact and Implementations</h2>
 <p>So, what’s the contribution of this paper?</p>
 <p>Well, as the authors describe it, it’s the “module-message” paradigm: something that you’ve probably seen before and the reason this paper has sounded so familiar: <strong>Erlang</strong>, or more specifically <strong>Distributed Erlang</strong>.</p>
-<p>PLITS, only briefly mentioned in Joe Armstrong’s thesis, bears a striking resemblance to Erlang and brings some of the features that are used on a daily basis by Erlang developers. We quickly summarize those features now.</p>
+<p>PLITS, only briefly mentioned in Joe Armstrong’s thesis <span class="citation">(Armstrong 2010)</span>, bears a striking resemblance to Erlang and brings some of the features that are used on a daily basis by Erlang developers. We quickly summarize those features now.</p>
 <ul>
 <li><p>Selective receive through the use of a transaction identifier has a strong resemblance to Erlang’s ability to generate a globally unique reference and use it as criteria to select from the process mailbox. This supports the forwarding behavior of processes that serve mainly for the routing of a request.</p></li>
 <li><p>Repetition in slot values, where each value is tagged in the initial position by type bear a strong resemblance of how tagged tuples are used in records to specify a typed value purely as tuples.</p></li>
@@ -47,6 +47,9 @@
 </ul>
 <p>We should be clear, however, that PLITS is <strong>not</strong> an actor-based language such as Erlang. While PLITS shares many of the same design patterns and abstractions, the language is fundamentally a module-message system: modules are identified by name, which includes a location and incarnation number and are the target of messages, not processes.</p>
 <div id="refs" class="references">
+<div id="ref-armstrong2010erlang">
+<p>Armstrong, Joe. 2010. “Erlang.” <em>Communications of the ACM</em> 53 (9). ACM: 68–75.</p>
+</div>
 <div id="ref-feldman1979high">
 <p>Feldman, Jerome A. 1979. “High Level Programming for Distributed Computing.” <em>Communications of the ACM</em> 22 (6). ACM: 353–68.</p>
 </div>
