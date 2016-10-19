@@ -15,14 +15,14 @@ page.
 Download all of the posts here:
 https://github.com/cmeiklejohn/PMLDC/blob/master/pmldc.pdf
 
-## Contributing
-
-TODO's on sections to be written are in `todo.tex`.
-
 ### Blog
 
 Or, view them on my blog:
 http://christophermeiklejohn.com
+
+### Contributing
+
+TODO's on sections to be written are in `todo.tex`.
 
 ## Copyright
 
