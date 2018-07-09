@@ -27,7 +27,7 @@ We enumerate here the list of specific goals the language designers had for Emer
 \item To support \textit{the principle of information hiding} and have a single semantics for both large and small, local or distributed, objects.
 \item Distributed programs can fail: the network can be down, a service can be unavailable, and therefore a language for building distributed applications needs to \textit{provide the programmer tools for dealing with these failures.}
 \item \textit{Minimization of the language} by removing many of the features seen in other languages and building abstractions that could be used to extend the language.
-\item \textit{Object location needs to be explicit} even as much as the authors wanted to follow the \textit{principle of information hiding} as it directly impacts performance.  Objects should be able to move moved, but moving an object should not change the operational semantics of the language\footnote{This dichotomy is presented as the \textit{semantics} vs. the \textit{locatics} of the language and the authors soon realized that one aspect of the language influenced both of these: failures.}.
+\item \textit{Object location needs to be explicit} even as much as the authors wanted to follow the \textit{principle of information hiding} as it directly impacts performance.  Objects should be able to be moved, but moving an object should not change the operational semantics of the language\footnote{This dichotomy is presented as the \textit{semantics} vs. the \textit{locatics} of the language and the authors soon realized that one aspect of the language influenced both of these: failures.}.
 \end{enumerate}
 
 \subsection{Impact and Implementations}
