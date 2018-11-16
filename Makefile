@@ -5,3 +5,4 @@ pandoc:
 	pandoc rpc.tex -o rpc.html --bibliography pl.bib
 	pandoc plits.tex -o plits.html --bibliography pl.bib
 	pandoc argus.tex -o argus.html --bibliography pl.bib
+	pandoc guesstimate.tex -o guesstimate.html --bibliography pl.bib
